@@ -1,6 +1,6 @@
 #import numpy as np
 #import datetime as dt
-import os, sys, shutil, platform
+import os, sys, shutil, platform, glob
 import subprocess as sp
 from config_tools import Config
 from env_modules_python import module  #lmod
@@ -47,6 +47,10 @@ class ConfigGcmRun(Config):
         self.total_nodes = None
         self.total_pes = None
  
+        self.end_date  = None #prepare_fixed_files
+        self.num_sgmt  = None
+        self.fsegment  = None
+        self.use_shmem = None
 
     def load_g5modules(self,site):
         """
@@ -212,15 +216,65 @@ class ConfigGcmRun(Config):
                 """
                 raise RuntimeError(msg)
                 sys.exit(4)
- 
+
+    def prepare_fixed_files(self):
+        """
+        Move to Scratch Directory and Copy RC Files from Home Directory
+        """
+        if os.path.exists(self.scrdir):
+            if len(os.listdir(self.scrdir)) != 0:
+                print("scratch dir ({}) not empty. Delete it and recreate a one".format(self.scrdir))
+                shutil.rmtree(self.scrdir)   
+                os.makedirs(self.scrdir)
+
+        else:
+            raise RuntimeError("scratch directory ({}) not found".format(self.scrdir))
+            sys.exit(4)
+
+        rcdir = os.path.join(self.expdir, "RC")
+        for f in os.listdir(rcdir):
+            src = os.path.join(rcdir, f)
+            dst = os.path.join(self.scrdir, f)
+
+            if os.path.isfile(src) or os.path.islink(src):
+                if os.path.exists(dst):
+                    print("{} already in {}".format(f, self.scrdir))
+                    os.remove(dst)
+                shutil.copyfile(src, dst)    
+
+        src = os.path.join(self.expdir, "cap_restart")
+        dst = os.path.join(self.scrdir, "cap_restart")
+        shutil.copyfile(src, dst)
+
+        for ftype in ("*.rc","*.nml","*.yaml"):
+            srcs = glob.glob(os.path.join(self.homdir, ftype))
+            for src in srcs:
+                dst = os.path.join(self.scrdir, os.path.basename(src))
+                print(src, "--->", dst)
+                shutil.copyfile(src, dst)
+
+        src = os.path.join(self.geosbin, "bundleParser.py")
+        dst = os.path.join(self.scrdir, "bundleParser.py")
+        shutil.copyfile(src, dst)
+
+        #cat fvcore_layout.rc >> input.nml
+        with open(os.path.join(self.scrdir,"fvcore_layout.rc"), "r") as fin:
+            buf = fin.read()
+            with open(os.path.join(self.scrdir,"input.nml"), "a") as fout:
+                fout.write(buf)
+
+        for f in ("MOM_input","MOM_override"):
+            src = os.path.join(self.homdir, f)
+            dst = os.path.join(self.scrdir, f)
+            shutil.copyfile(src, dst)
+        
+
+        self.end_date  = run_grep("grep '^\s*END_DATE:'     CAP.rc | cut -d: -f2", wkdir=self.scrdir).strip().lstrip() 
+        self.num_sgmt  = run_grep("grep '^\s*NUM_SGMT:'     CAP.rc | cut -d: -f2", wkdir=self.scrdir).strip().lstrip()
+        self.fsegment  = run_grep("grep '^\s*FCST_SEGMENT:' CAP.rc | cut -d: -f2", wkdir=self.scrdir).strip().lstrip()
+        self.use_shmem = run_grep("grep '^\s*USE_SHMEM:'    CAP.rc | cut -d: -f2", wkdir=self.scrdir).strip().lstrip()
 
 
-
-def prepare_fixed_files():
-    """
-    Move to Scratch Directory and Copy RC Files from Home Directory
-    """
-    pass
 
 def create_history_collection():
     """
@@ -251,11 +305,12 @@ if __name__ == '__main__':
                      geosutil = "/gpfsm/dnb06/projects/p179/cda/GEOSgcm_08Nov2022/install")
     #print(os.environ["LD_LIBRARY_PATH"])
     #print(os.environ["LD_LIBRARY64_PATH"])
-    cfg.set_exp_vars(expid  = "test_gcmrun", \
-                     expdir = "/discover/nobackup/cda/projects/mytools/test_gcmrun", \
-                     homdir = "/discover/nobackup/cda/projects/mytools/test_gcmrun")
+    cfg.set_exp_vars(expid  = "test_code", \
+                     expdir = "/discover/nobackup/cda/projects/test_code", \
+                     homdir = "/discover/nobackup/cda/projects/test_code")
     cfg.create_exp_subdirs()
     cfg.set_exp_run_params(ncpus=45*27, ncpus_per_node=45)
+    cfg.prepare_fixed_files()
 
     print("="*80+'\n')
     print(cfg)
