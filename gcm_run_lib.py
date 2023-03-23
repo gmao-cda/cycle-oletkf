@@ -10,11 +10,16 @@ def calc_num_model_nodes(model_npes, ncpus_per_node):
     y = int(x)
     return y+1 if x>y else y
 
-def run_grep(cmd, wkdir):
-    return sp.Popen(cmd, cwd=wkdir, shell=True,stdout=sp.PIPE).communicate()[0].decode()
+def get_cmd_out(cmd, wkdir, showError=False):
+    p = sp.Popen(cmd, cwd=wkdir, shell=True,stdout=sp.PIPE, stderr=sp.PIPE)
+    out, err = p.communicate()
+    if showError: print("ERROR_MESSAGE={}".format(err.decode()))
+    return out.decode()
 
 class ConfigGcmRun(Config):
     def __init__(self):
+        self.flowdir = None 
+
         self.geosdir  = None
         self.geosbin  = None
         self.geosetc  = None
@@ -51,6 +56,8 @@ class ConfigGcmRun(Config):
         self.num_sgmt  = None
         self.fsegment  = None
         self.use_shmem = None
+
+        self.collections = None #create_history_collection 
 
     def load_g5modules(self,site):
         """
@@ -159,20 +166,20 @@ class ConfigGcmRun(Config):
             raise RuntimeError("AGCM.rc not found under: {}".format(self.homdir))
             sys.exit(1)
 
-        self.nx      = int( run_grep("grep '^\s*NX:'             AGCM.rc | cut -d: -f2", wkdir=self.homdir) )
-        self.ny      = int( run_grep("grep '^\s*NY:'             AGCM.rc | cut -d: -f2", wkdir=self.homdir) )
-        self.agcm_im = int( run_grep("grep '^\s*AGCM_IM:'        AGCM.rc | cut -d: -f2", wkdir=self.homdir) )
-        self.agcm_jm = int( run_grep("grep '^\s*AGCM_JM:'        AGCM.rc | cut -d: -f2", wkdir=self.homdir) )
-        self.agcm_lm = int( run_grep("grep '^\s*AGCM_LM:'        AGCM.rc | cut -d: -f2", wkdir=self.homdir) )
-        self.ogcm_im = int( run_grep("grep '^\s*OGCM\.IM_WORLD:' AGCM.rc | cut -d: -f2", wkdir=self.homdir) )
-        self.ogcm_jm = int( run_grep("grep '^\s*OGCM\.JM_WORLD:' AGCM.rc | cut -d: -f2", wkdir=self.homdir) )
-        self.ogcm_lm = int( run_grep("grep '^\s*OGCM\.LM:'       AGCM.rc | cut -d: -f2", wkdir=self.homdir) )
-        self.nx      = int( run_grep("grep '^\s*OGCM\.NX:'       AGCM.rc | cut -d: -f2", wkdir=self.homdir) )
-        self.ny      = int( run_grep("grep '^\s*OGCM\.NY:'       AGCM.rc | cut -d: -f2", wkdir=self.homdir) )
+        self.nx      = int( get_cmd_out("grep '^\s*NX:'             AGCM.rc | cut -d: -f2", wkdir=self.homdir) )
+        self.ny      = int( get_cmd_out("grep '^\s*NY:'             AGCM.rc | cut -d: -f2", wkdir=self.homdir) )
+        self.agcm_im = int( get_cmd_out("grep '^\s*AGCM_IM:'        AGCM.rc | cut -d: -f2", wkdir=self.homdir) )
+        self.agcm_jm = int( get_cmd_out("grep '^\s*AGCM_JM:'        AGCM.rc | cut -d: -f2", wkdir=self.homdir) )
+        self.agcm_lm = int( get_cmd_out("grep '^\s*AGCM_LM:'        AGCM.rc | cut -d: -f2", wkdir=self.homdir) )
+        self.ogcm_im = int( get_cmd_out("grep '^\s*OGCM\.IM_WORLD:' AGCM.rc | cut -d: -f2", wkdir=self.homdir) )
+        self.ogcm_jm = int( get_cmd_out("grep '^\s*OGCM\.JM_WORLD:' AGCM.rc | cut -d: -f2", wkdir=self.homdir) )
+        self.ogcm_lm = int( get_cmd_out("grep '^\s*OGCM\.LM:'       AGCM.rc | cut -d: -f2", wkdir=self.homdir) )
+        self.nx      = int( get_cmd_out("grep '^\s*OGCM\.NX:'       AGCM.rc | cut -d: -f2", wkdir=self.homdir) )
+        self.ny      = int( get_cmd_out("grep '^\s*OGCM\.NY:'       AGCM.rc | cut -d: -f2", wkdir=self.homdir) )
 
         self.use_ioserver = 1
-        self.num_oserver_nodes = int( run_grep("grep '^\s*IOSERVER_NODES:'  AGCM.rc | cut -d: -f2", wkdir=self.homdir) )
-        self.num_backend_pes    = int( run_grep("grep '^\s*NUM_BACKEND_PES:' AGCM.rc | cut -d: -f2", wkdir=self.homdir) )
+        self.num_oserver_nodes = int( get_cmd_out("grep '^\s*IOSERVER_NODES:'  AGCM.rc | cut -d: -f2", wkdir=self.homdir) )
+        self.num_backend_pes    = int( get_cmd_out("grep '^\s*NUM_BACKEND_PES:' AGCM.rc | cut -d: -f2", wkdir=self.homdir) )
 
         self.model_npes = self.nx * self.ny
         self.ncpus_per_node = ncpus_per_node
@@ -250,7 +257,6 @@ class ConfigGcmRun(Config):
             srcs = glob.glob(os.path.join(self.homdir, ftype))
             for src in srcs:
                 dst = os.path.join(self.scrdir, os.path.basename(src))
-                print(src, "--->", dst)
                 shutil.copyfile(src, dst)
 
         src = os.path.join(self.geosbin, "bundleParser.py")
@@ -269,18 +275,28 @@ class ConfigGcmRun(Config):
             shutil.copyfile(src, dst)
         
 
-        self.end_date  = run_grep("grep '^\s*END_DATE:'     CAP.rc | cut -d: -f2", wkdir=self.scrdir).strip().lstrip() 
-        self.num_sgmt  = run_grep("grep '^\s*NUM_SGMT:'     CAP.rc | cut -d: -f2", wkdir=self.scrdir).strip().lstrip()
-        self.fsegment  = run_grep("grep '^\s*FCST_SEGMENT:' CAP.rc | cut -d: -f2", wkdir=self.scrdir).strip().lstrip()
-        self.use_shmem = run_grep("grep '^\s*USE_SHMEM:'    CAP.rc | cut -d: -f2", wkdir=self.scrdir).strip().lstrip()
+        self.end_date  = get_cmd_out("grep '^\s*END_DATE:'     CAP.rc | cut -d: -f2", wkdir=self.scrdir).strip().lstrip() 
+        self.num_sgmt  = get_cmd_out("grep '^\s*NUM_SGMT:'     CAP.rc | cut -d: -f2", wkdir=self.scrdir).strip().lstrip()
+        self.fsegment  = get_cmd_out("grep '^\s*FCST_SEGMENT:' CAP.rc | cut -d: -f2", wkdir=self.scrdir).strip().lstrip()
+        self.use_shmem = get_cmd_out("grep '^\s*USE_SHMEM:'    CAP.rc | cut -d: -f2", wkdir=self.scrdir).strip().lstrip()
 
+    def create_history_collection(self):
+        """
+        Create HISTORY Collection Directories
+        """
 
+        src = os.path.join(self.flowdir, "get_collections.csh")
+        dst = os.path.join(self.scrdir, "get_collections.csh")
+        shutil.copyfile(src, dst)
 
-def create_history_collection():
-    """
-    Create HISTORY Collection Directories
-    """
-    pass
+        self.collections = get_cmd_out("/usr/bin/csh get_collections.csh", wkdir=self.scrdir).strip().lstrip().split()
+        print("collections=",self.collections)
+        for collection in self.collections:
+            if not os.path.exists( os.path.join(self.expdir,collection) ):
+                os.makedirs( os.path.join(self.expdir,collection) )
+            if not os.path.exists( os.path.join(self.expdir, "holding", collection) ):
+                os.makedirs( os.path.join(self.expdir, "holding", collection) )
+
 
 def link_bcs():
     """
@@ -297,6 +313,9 @@ def get_exec_rst():
 
 if __name__ == '__main__':
     cfg = ConfigGcmRun()
+    cfg.flowdir = "/discover/nobackup/cda/develop_space/geos-workflow"
+    cfg.flowdir = os.path.abspath(cfg.flowdir)
+
     cfg.load_g5modules(site = "NCCS")
     cfg.set_env_vars(site     = "NCCS", \
                      geosdir  = "/gpfsm/dnb06/projects/p179/cda/GEOSgcm_08Nov2022/install", \
@@ -311,6 +330,7 @@ if __name__ == '__main__':
     cfg.create_exp_subdirs()
     cfg.set_exp_run_params(ncpus=45*27, ncpus_per_node=45)
     cfg.prepare_fixed_files()
+    cfg.create_history_collection()
 
     print("="*80+'\n')
     print(cfg)
