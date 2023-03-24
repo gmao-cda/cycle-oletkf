@@ -59,6 +59,15 @@ class ConfigGcmRun(Config):
 
         self.collections = None #create_history_collection 
 
+        self.bcsdir    = None # link_bcs
+        self.chmdir    = None
+        self.bcrslv    = None
+        self.dateline  = None
+        self.emissions = None
+        self.abcsdir   = None
+        self.obcsdir   = None
+        self.sstdir    = None
+ 
     def load_g5modules(self,site):
         """
         dirty verion that only works on NCCS discover and my gcm version
@@ -247,21 +256,21 @@ class ConfigGcmRun(Config):
                 if os.path.exists(dst):
                     print("{} already in {}".format(f, self.scrdir))
                     os.remove(dst)
-                shutil.copyfile(src, dst)    
+                shutil.copy2(src, dst)    
 
         src = os.path.join(self.expdir, "cap_restart")
         dst = os.path.join(self.scrdir, "cap_restart")
-        shutil.copyfile(src, dst)
+        shutil.copy2(src, dst)
 
         for ftype in ("*.rc","*.nml","*.yaml"):
             srcs = glob.glob(os.path.join(self.homdir, ftype))
             for src in srcs:
                 dst = os.path.join(self.scrdir, os.path.basename(src))
-                shutil.copyfile(src, dst)
+                shutil.copy2(src, dst)
 
         src = os.path.join(self.geosbin, "bundleParser.py")
         dst = os.path.join(self.scrdir, "bundleParser.py")
-        shutil.copyfile(src, dst)
+        shutil.copy2(src, dst)
 
         #cat fvcore_layout.rc >> input.nml
         with open(os.path.join(self.scrdir,"fvcore_layout.rc"), "r") as fin:
@@ -272,7 +281,7 @@ class ConfigGcmRun(Config):
         for f in ("MOM_input","MOM_override"):
             src = os.path.join(self.homdir, f)
             dst = os.path.join(self.scrdir, f)
-            shutil.copyfile(src, dst)
+            shutil.copy2(src, dst)
         
 
         self.end_date  = get_cmd_out("grep '^\s*END_DATE:'     CAP.rc | cut -d: -f2", wkdir=self.scrdir).strip().lstrip() 
@@ -287,9 +296,9 @@ class ConfigGcmRun(Config):
 
         src = os.path.join(self.flowdir, "get_collections.csh")
         dst = os.path.join(self.scrdir, "get_collections.csh")
-        shutil.copyfile(src, dst)
+        shutil.copy2(src, dst)
 
-        self.collections = get_cmd_out("/usr/bin/csh get_collections.csh", wkdir=self.scrdir).strip().lstrip().split()
+        self.collections = get_cmd_out("./get_collections.csh", wkdir=self.scrdir).strip().lstrip().split()
         print("collections=",self.collections)
         for collection in self.collections:
             if not os.path.exists( os.path.join(self.expdir,collection) ):
@@ -297,12 +306,92 @@ class ConfigGcmRun(Config):
             if not os.path.exists( os.path.join(self.expdir, "holding", collection) ):
                 os.makedirs( os.path.join(self.expdir, "holding", collection) )
 
+    def link_bcs(self, bcsdir=None,chmdir=None, bcrslv=None, dateline=None, \
+                 emissions=None, abcsdir=None, obcsdir=None, sstdir=None):
+        """
+        Link Boundary Datasets
+        """
+        self.bcsdir = os.path.abspath(bcsdir)
+        self.chmdir = os.path.abspath(chmdir)
+        self.bcrslv = bcrslv
+        self.dateline = dateline
+        self.emissions = emissions
+        self.abcsdir = os.path.abspath(abcsdir)
+        self.obcsdir = os.path.abspath(obcsdir)  # FIXME: in gcm_run.j: OGCM_IM/JM not hard-coded
+        self.sstdir  = os.path.abspath(sstdir)   # FIXME: in gcm_run.j: OGCM_IM/JM not hard-coded
+        self.bctag   = os.path.basename(self.abcsdir)
 
-def link_bcs():
-    """
-    Link Boundary Datasets
-    """
-    pass
+        linkbcs_path = os.path.join(self.scrdir, "linkbcs")
+        if os.path.exists(linkbcs_path): os.remove(linkbcs_path)
+        msg = f"""
+#!/bin/csh -f
+
+/bin/mkdir -p RESTART
+/bin/mkdir -p            ExtData
+/bin/ln    -sf {self.chmdir}/* ExtData
+
+/bin/ln -sf {self.obcsdir}/SEAWIFS_KPAR_mon_clim.{self.ogcm_im}x{self.ogcm_jm} SEAWIFS_KPAR_mon_clim.data
+/bin/ln -sf {self.abcsdir}/CF0180x6C_TM1440xTM1080-Pfafstetter.til   tile.data
+/bin/ln -sf {self.abcsdir}/CF0180x6C_TM1440xTM1080-Pfafstetter.TRN   runoff.bin
+/bin/ln -sf {self.obcsdir}/MAPL_Tripolar.nc .
+/bin/ln -sf {self.obcsdir}/vgrid{self.ogcm_lm}.ascii ./vgrid.ascii
+#/bin/ln -s /discover/nobackup/projects/gmao/ssd/aogcm/MOM6/DC0720xPC0361_TM1440xTM1080/DC0720xPC0361_TM1440xTM1080-Pfafstetter.til tile_hist.data
+
+# Precip correction
+#/bin/ln -s /discover/nobackup/projects/gmao/share/gmao_ops/fvInput/merra_land/precip_CPCUexcludeAfrica-CMAP_corrected_MERRA/GEOSdas-2_1_4 ExtData/PCP
+
+
+# DAS or REPLAY Mode (AGCM.rc:  pchem_clim_years = 1-Year Climatology)
+# --------------------------------------------------------------------
+/bin/ln -sf {self.bcsdir}/Shared/pchem.species.Clim_Prod_Loss.z_721x72.nc4 species.data
+
+# CMIP-5 Ozone Data (AGCM.rc:  pchem_clim_years = 228-Years)
+# ----------------------------------------------------------
+#/bin/ln -sf {self.bcsdir}/Shared/pchem.species.CMIP-5.1870-2097.z_91x72.nc4 species.data
+
+# S2S pre-industrial with prod/loss of stratospheric water vapor
+# (AGCM.rc:  pchem_clim_years = 3-Years,  and  H2O_ProdLoss: 1 )
+# --------------------------------------------------------------
+#/bin/ln -sf {self.bcsdir}/Shared/pchem.species.CMIP-6.wH2OandPL.1850s.z_91x72.nc4 species.data
+
+# MERRA-2 Ozone Data (AGCM.rc:  pchem_clim_years = 39-Years)
+# ----------------------------------------------------------
+#/bin/ln -sf {self.bcsdir}/Shared/pchem.species.CMIP-5.MERRA2OX.197902-201706.z_91x72.nc4 species.data
+
+/bin/ln -sf {self.bcsdir}/Shared/*bin .
+/bin/ln -sf {self.bcsdir}/Shared/*c2l*.nc4 .
+
+
+/bin/ln -sf {self.abcsdir}/visdf_{self.agcm_im}x{self.agcm_jm}.dat visdf.dat
+/bin/ln -sf {self.abcsdir}/nirdf_{self.agcm_im}x{self.agcm_jm}.dat nirdf.dat
+/bin/ln -sf {self.abcsdir}/vegdyn_{self.agcm_im}x{self.agcm_jm}.dat vegdyn.data
+/bin/ln -sf {self.abcsdir}/lai_clim_{self.agcm_im}x{self.agcm_jm}.data lai.data
+/bin/ln -sf {self.abcsdir}/green_clim_{self.agcm_im}x{self.agcm_jm}.data green.data
+/bin/ln -sf {self.abcsdir}/ndvi_clim_{self.agcm_im}x{self.agcm_jm}.data ndvi.data
+
+
+
+/bin/ln -sf {self.abcsdir}/topo_DYN_ave_{self.agcm_im}x{self.agcm_jm}.data topo_dynave.data
+/bin/ln -sf {self.abcsdir}/topo_GWD_var_{self.agcm_im}x{self.agcm_jm}.data topo_gwdvar.data
+/bin/ln -sf {self.abcsdir}/topo_TRB_var_{self.agcm_im}x{self.agcm_jm}.data topo_trbvar.data
+
+if(     -e  {self.bcsdir}/{self.bcrslv}/Gnomonic_{self.bcrslv}.dat ) then
+/bin/ln -sf {self.bcsdir}/{self.bcrslv}/Gnomonic_{self.bcrslv}.dat .
+endif
+
+ cp {self.homdir}/*_table .
+ cp {self.obcsdir}/INPUT/* INPUT
+ /bin/ln -sf {self.obcsdir}/cice/kmt_cice.bin .
+ /bin/ln -sf {self.obcsdir}/cice/grid_cice.bin .
+
+        """
+        with open(linkbcs_path,"w") as f:
+            f.write(msg)
+
+        os.chmod(linkbcs_path, 0o755)  # equivalent to chmod+x
+        dst = os.path.join(self.expdir, os.path.basename(linkbcs_path))
+        shutil.copy2(linkbcs_path, dst)
+        
 
 def get_exec_rst():
     """
@@ -331,6 +420,13 @@ if __name__ == '__main__':
     cfg.set_exp_run_params(ncpus=45*27, ncpus_per_node=45)
     cfg.prepare_fixed_files()
     cfg.create_history_collection()
-
+    cfg.link_bcs(bcsdir    = "/discover/nobackup/ltakacs/bcs/Icarus-NLv3/Icarus-NLv3_Reynolds", \
+                 chmdir    = "/discover/nobackup/projects/gmao/share/gmao_ops/fvInput_nc3", \
+                 bcrslv    = "CF0180x6C_DE0360xPE0180", \
+                 dateline  = "DC", \
+                 emissions = "OPS_EMISSIONS", \
+                 abcsdir   = "/discover/nobackup/projects/gmao/ssd/aogcm/atmosphere_bcs/Icarus-NLv3/MOM6/CF0180x6C_TM1440xTM1080_newtopo", \
+                 obcsdir   = "/discover/nobackup/projects/gmao/ssd/aogcm/ocean_bcs/MOM6/{}x{}_newtopo".format(cfg.ogcm_im,cfg.ogcm_jm), \
+                 sstdir    = "/discover/nobackup/projects/gmao/ssd/aogcm/SST/MERRA2/{}x{}".format(cfg.ogcm_im,cfg.ogcm_jm))
     print("="*80+'\n')
     print(cfg)
