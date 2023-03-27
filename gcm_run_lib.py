@@ -393,11 +393,87 @@ endif
         shutil.copy2(linkbcs_path, dst)
         
 
-def get_exec_rst():
-    """
-    Get Executable and RESTARTS
-    """
-    pass
+    def get_exec_rst(self):
+        """
+        Get Executable and RESTARTS
+        """
+
+        print("Hello from get_exec_rst") 
+
+        src = os.path.join(self.expdir, "GEOSgcm.x")
+        dst = os.path.join(self.scrdir, "GEOSgcm.x")
+        shutil.copy2(src, dst)
+
+        self.rst_files        = get_cmd_out("grep 'RESTART_FILE'    AGCM.rc | grep -v VEGDYN | grep -v '#' | cut -d ':' -f1 | cut -d '_' -f1-2",wkdir=self.scrdir).strip().lstrip().split()
+        self.rst_file_names    = get_cmd_out("grep 'RESTART_FILE'    AGCM.rc | grep -v VEGDYN | grep -v '#' | cut -d ':' -f2",wkdir=self.scrdir).strip().lstrip().split()
+        self.chk_files         = get_cmd_out("grep 'CHECKPOINT_FILE' AGCM.rc | grep -v '#' | cut -d ':' -f1 | cut -d '_' -f1-2",wkdir=self.scrdir).strip().lstrip().split()
+        self.chk_file_names    = get_cmd_out("grep 'CHECKPOINT_FILE' AGCM.rc | grep -v '#' | cut -d ':' -f2",wkdir=self.scrdir).strip().lstrip().split()
+        self.monthly_chk_names = get_cmd_out(f"cat {self.expdir}/HISTORY.rc | grep -v '^[\\t ]*#' | sed -n 's/\([^\\t ]\+\).monthly:[\\t ]*1.*/\\1/p' | sed 's/$/_rst/'",wkdir=self.scrdir).strip().lstrip().split()
+
+        # Remove possible bootstrap parameters(+/-)
+        for i in range(len(self.rst_file_names)):
+            if self.rst_file_names[i][0:1] == '+' or self.rst_file_names[i][0:1] == '-':
+                self.rst_file_names[i] = self.rst_file_names[i][1:]
+
+        # Copy Restarts to Scratch Directory
+        all_rst_files = self.rst_file_names + self.monthly_chk_names
+        for rst_file in all_rst_files:
+            src = os.path.join(self.expdir,rst_file)
+            dst = os.path.join(self.scrdir,rst_file)
+            if os.path.exists(src):
+                shutil.copy2(src, dst)
+
+        os.makedirs( os.path.join(self.scrdir, "INPUT"))
+        srcs = glob.glob(os.path.join(self.expdir,"RESTART/*"))
+        if not srcs:
+            raise RuntimeError("RESTART directory ({}) is empty. Abort...".format(os.path.join(self.expdir,"RESTART")))
+            sys.exit(5)
+
+        for src in srcs:
+            file_name = os.path.basename(src)
+            dst = os.path.join(self.scrdir, "INPUT", file_name)
+            shutil.copy2(src, dst)
+
+        # Copy and Tar Initial Restarts to Restarts Directory
+        # cap_restart YYYYMMDD HHmmss
+        #             123456789012345
+        #             012345678901234
+        with open(os.path.join(self.scrdir,"cap_restart"),"r") as f:
+            date_str = f.readline()
+        edate = "e{}_{}z".format(date_str[0:8],date_str[9:11])
+        print(edate)
+        rst_tar_files = glob.glob(os.path.join(self.expdir, f"restarts/*{edate}*"))
+        if not rst_tar_files: # does not exist saved IC
+            # non-ocean restart files
+            for rst in self.rst_file_names:
+                src = os.path.join(self.scrdir, rst)
+                file_name = f"{self.expid}.{rst}.{edate}.{self.gcmver}.{self.bctag}_{self.bcrslv}"
+                dst = os.path.join(self.expdir,"restarts",file_name)
+                if os.path.exists(src) and not os.path.exists(dst):
+                    print(src,"-->",dst)
+                    shutil.copy2(src, dst)
+
+            # ocean restart files
+            src = os.path.join(self.expdir,"RESTART")
+            dst = os.path.join(self.expdir,"restarts",f"RESTART.{edate}")
+            if not os.path.exists(dst):
+                shutil.copytree(src,dst)
+            else:
+                raise RuntimeError("copy ocean restart files: directory ({dst}) already exists. abort...")
+                sys.exit(6)
+            
+            # create tarball
+            tar_file_name = f"restarts.{edate}.tar"
+            pattern = f"{self.expid}.*.{edate}.{self.gcmver}.{self.bctag}_{self.bcrslv}"
+            rst_files = glob.glob(os.path.join(self.expdir, "restarts", pattern))
+            cmd = f"tar cvf {tar_file_name} " + " ".join(rst_files) + f" RESTART.{edate}"
+            print("cmd=",cmd)
+            get_cmd_out(cmd, wkdir=os.path.join(self.expdir, "restarts"))
+
+
+       
+
+
 
 
 if __name__ == '__main__':
@@ -428,5 +504,6 @@ if __name__ == '__main__':
                  abcsdir   = "/discover/nobackup/projects/gmao/ssd/aogcm/atmosphere_bcs/Icarus-NLv3/MOM6/CF0180x6C_TM1440xTM1080_newtopo", \
                  obcsdir   = "/discover/nobackup/projects/gmao/ssd/aogcm/ocean_bcs/MOM6/{}x{}_newtopo".format(cfg.ogcm_im,cfg.ogcm_jm), \
                  sstdir    = "/discover/nobackup/projects/gmao/ssd/aogcm/SST/MERRA2/{}x{}".format(cfg.ogcm_im,cfg.ogcm_jm))
+    cfg.get_exec_rst()
     print("="*80+'\n')
     print(cfg)
