@@ -136,7 +136,7 @@ class ConfigGcmRun(Config):
         self.run_cmd = self.geosbin + "/esma_mpirun -np"
 
         with open(os.path.join(self.geosetc, ".AGCM_VERSION")) as f:
-            self.gcmver = f.readline()
+            self.gcmver = f.readline().strip().lstrip()
         print("VERSION:", self.gcmver)
 
 
@@ -388,7 +388,7 @@ endif
         with open(linkbcs_path,"w") as f:
             f.write(msg)
 
-        os.chmod(linkbcs_path, 0o755)  # equivalent to chmod+x
+        os.chmod(linkbcs_path, 0o755)  # equivalent to chmod 755
         dst = os.path.join(self.expdir, os.path.basename(linkbcs_path))
         shutil.copy2(linkbcs_path, dst)
         
@@ -411,11 +411,13 @@ endif
         self.monthly_chk_names = get_cmd_out(f"cat {self.expdir}/HISTORY.rc | grep -v '^[\\t ]*#' | sed -n 's/\([^\\t ]\+\).monthly:[\\t ]*1.*/\\1/p' | sed 's/$/_rst/'",wkdir=self.scrdir).strip().lstrip().split()
 
         # Remove possible bootstrap parameters(+/-)
+        print("Remove possible bootstrap parameters(+/-)")
         for i in range(len(self.rst_file_names)):
             if self.rst_file_names[i][0:1] == '+' or self.rst_file_names[i][0:1] == '-':
                 self.rst_file_names[i] = self.rst_file_names[i][1:]
 
         # Copy Restarts to Scratch Directory
+        print("Copy Restarts to Scratch Directory")
         all_rst_files = self.rst_file_names + self.monthly_chk_names
         for rst_file in all_rst_files:
             src = os.path.join(self.expdir,rst_file)
@@ -435,45 +437,71 @@ endif
             shutil.copy2(src, dst)
 
         # Copy and Tar Initial Restarts to Restarts Directory
+        print("Copy and Tar Initial Restarts to Restarts Directory")
         # cap_restart YYYYMMDD HHmmss
         #             123456789012345
         #             012345678901234
         with open(os.path.join(self.scrdir,"cap_restart"),"r") as f:
-            date_str = f.readline()
+            date_str = f.readline().strip().lstrip()
         edate = "e{}_{}z".format(date_str[0:8],date_str[9:11])
         print(edate)
         rst_tar_files = glob.glob(os.path.join(self.expdir, f"restarts/*{edate}*"))
         if not rst_tar_files: # does not exist saved IC
+
+            # create a tmp dir to prepare IC tarball
+            tmp_tardir = os.path.join(self.expdir,"restarts","tmp_tardir_{}".format(edate))
+            os.makedirs(tmp_tardir)
+
             # non-ocean restart files
             for rst in self.rst_file_names:
                 src = os.path.join(self.scrdir, rst)
                 file_name = f"{self.expid}.{rst}.{edate}.{self.gcmver}.{self.bctag}_{self.bcrslv}"
-                dst = os.path.join(self.expdir,"restarts",file_name)
+                dst = os.path.join(tmp_tardir,file_name)
                 if os.path.exists(src) and not os.path.exists(dst):
                     print(src,"-->",dst)
                     shutil.copy2(src, dst)
 
             # ocean restart files
             src = os.path.join(self.expdir,"RESTART")
-            dst = os.path.join(self.expdir,"restarts",f"RESTART.{edate}")
+            dst = os.path.join(tmp_tardir,f"RESTART.{edate}")
             if not os.path.exists(dst):
                 shutil.copytree(src,dst)
             else:
-                raise RuntimeError("copy ocean restart files: directory ({dst}) already exists. abort...")
+                raise RuntimeError("copy ocean restart files: directory ({}) already exists. abort...".format(dst))
                 sys.exit(6)
             
             # create tarball
             tar_file_name = f"restarts.{edate}.tar"
             pattern = f"{self.expid}.*.{edate}.{self.gcmver}.{self.bctag}_{self.bcrslv}"
-            rst_files = glob.glob(os.path.join(self.expdir, "restarts", pattern))
-            cmd = f"tar cvf {tar_file_name} " + " ".join(rst_files) + f" RESTART.{edate}"
-            print("cmd=",cmd)
-            get_cmd_out(cmd, wkdir=os.path.join(self.expdir, "restarts"))
+            rst_file_paths = glob.glob(os.path.join(tmp_tardir, pattern))
+            rst_files = []
+            for rst_file_path in rst_file_paths:
+                rst_files.append(os.path.basename(rst_file_path))
+            tar_cmd = f"tar cvf {tar_file_name} " + " ".join(rst_files) + f" RESTART.{edate}"
+            get_cmd_out(tar_cmd, wkdir=tmp_tardir)
+            shutil.move(os.path.join(tmp_tardir,tar_file_name), os.path.join(self.expdir,"restarts"))
+            # remove the tmp dir for preparing the tarball
+            if os.path.exists(tmp_tardir): shutil.rmtree(tmp_tardir)
 
+        
+        # If any restart is binary, set NUM_READERS to 1 so that
+        # +-style bootstrapping of missing files can occur in
+        # MAPL. pbinary cannot do this, but pnc4 can.
+        print("check binary")
+        found_binary = 0
+        for rst in self.rst_file_names:
+            if os.path.exists(os.path.join(self.scrdir,rst)):
+                rst_type = get_cmd_out(f"/usr/bin/file -Lb --mime-type {rst}", wkdir=self.scrdir).strip().lstrip()
+                print("rst, type=", rst, rst_type)
+                if "application/octet-stream" in rst_type: found_binary = 1
 
-       
-
-
+        if found_binary == 1:
+            print("find_binary==1")
+            AGCM_path = os.path.join(self.scrdir,"AGCM.rc")
+            tmp_AGCM_path = os.path.join(self.scrdir,"AGCM.tmp")
+            os.rename(AGCM_path,tmp_AGCM_path)
+            get_cmd_out("cat AGCM.tmp | sed -e '/^NUM_READERS/ s/\([0-9]\+\)/1/g' > AGCM.rc",wkdir=self.scrdir)
+            if os.path.exists(tmp_AGCM_path): os.remove(tmp_AGCM_path)
 
 
 if __name__ == '__main__':
