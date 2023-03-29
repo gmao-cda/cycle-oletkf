@@ -1,6 +1,7 @@
 #import numpy as np
 #import datetime as dt
 import os, sys, shutil, platform, glob
+import datetime as dt
 import subprocess as sp
 from config_tools import Config
 from env_modules_python import module  #lmod
@@ -504,6 +505,148 @@ endif
             if os.path.exists(tmp_AGCM_path): os.remove(tmp_AGCM_path)
 
 
+    def prepare_extdata(self):
+        dst = os.path.join(self.scrdir,"EGRESS") 
+        if os.path.exists(dst): os.remove(dst)
+
+        # skip the segment run date parsing
+        # cap_restart YYYYMMDD HHmmss
+        #             123456789012345
+        #             012345678901234
+        with open(os.path.join(self.scrdir,"cap_restart"),"r") as f:
+            date_str = f.readline().strip().lstrip()
+        #nymdc = data_str[0:8]
+        nymdc = dt.datetime.strptime(date_str,"%Y%m%d %H%M%S")
+        sgmt_str = get_cmd_out("grep '^\s*JOB_SGMT:' CAP.rc | cut -d: -f2",wkdir=self.scrdir).strip().lstrip()
+        dyear  = int(sgmt_str[0:4])
+        dmonth = int(sgmt_str[4:6])
+        dday   = int(sgmt_str[6:8])
+        dhour  = int(sgmt_str[9:11])
+        dminute = int(sgmt_str[11:13])
+        dsecond = int(sgmt_str[13:15])
+        print(dyear,dmonth,dday,dhour,dminute,dsecond)
+        #00000100 000000
+        #yyyymmdd HHMMSS
+        #012345678901234
+        if dyear > 0 or dmonth > 0:
+            raise RuntimeError("does not support setting segment using YYYY or MM.abort...")
+            sys.exit(8)
+        dt_sgmt = dt.timedelta(days=dday, hours=dhour, minutes=dminute, seconds=dsecond)
+        nymdf = nymdc + dt_sgmt
+        print("nymdc   = ",nymdc)
+        print("dt_sgmt = ",dt_sgmt)
+        print("nymdf   = ",nymdf)
+
+        num_sgmt = int(get_cmd_out("grep '^\s*NUM_SGMT:' CAP.rc | cut -d: -f2",wkdir=self.scrdir))
+        if num_sgmt != 1:
+            raise RuntimeError("Does not support running with >1 segment. abort...")
+            sys.exit(7)
+
+        # which ExtData are we using
+        extdata2g_true = int(get_cmd_out("grep -i '^\s*USE_EXTDATA2G:\s*\.TRUE\.' CAP.rc | wc -l", \
+                             wkdir=self.scrdir))
+        print("extdata2g_true=",extdata2g_true)
+
+        # Select proper AMIP GOCART Emission RC Files
+        if self.emissions == "AMIP_EMISSIONS":
+            if extdata2g_true == 0:
+                AMIP_Transition_Date = dt.datetime(2000,3,1,0,0,0) 
+                # Before 2000-03-01, we need to use AMIP.20C which has different
+                # emissions (HFED instead of QFED) valid before 2000-03-01. Note
+                # that if you make a change to anything in $EXPDIR/RC/AMIP or
+                # $EXPDIR/RC/AMIP.20C, you might need to make a change in the other
+                # directory to be consistent. Some files in AMIP.20C are symlinks to
+                # that in AMIP but others are not.
+
+                if nymdc < AMIP_Transition_Date:
+                    AMIP_EMISSIONS_DIRECTORY = os.path.join(self.expdir, "RC", "AMIP.20C")
+                    if nymdf > AMIP_Transition_Date:
+                        raise RuntimeError("nymdc ({}) and nymdf ({}) cross the AMIP trans date ({})".format(nymdc, nymdf, AMIP_Transition_Date))
+                        sys.exit(9)
+                else:
+                    AMIP_EMISSIONS_DIRECTORY = os.path.join(self.expdir, "RC", "AMIP")
+
+                if self.agcm_lm == 72:
+                    for ftype in ("*.rc","*.yaml"):
+                        srcs = glob.glob(os.path.join(AMIP_EMISSIONS_DIRECTORY, ftype))
+                        for src in srcs:
+                            dst = os.path.join(self.scrdir, os.path.basename(src))
+                            #print("src:",src,"---> dst:", dst)
+                            shutil.copy2(src,dst)
+                else:
+                    raise RuntimeError("agcm_lm/=72 not implemented yet. abort...")
+                    sys.exit(10)
+
+                    #srcs  = glob.glob(os.path.join(AMIP_EMISSIONS_DIRECTORY,"*.rc")) + \
+                    #        glob.glob(os.path.join(AMIP_EMISSIONS_DIRECTORY,"*.yaml"))
+
+                    #for src in srcs:
+                    #    if os.path.exists(src): shutil.remove(src)
+                    #    dummy = os.path.join(self.scrdir,"dummy")
+                    #    if os.path.exists(dummy): shutil.remove(dummy)
+                    #    shutil.copy2(src, dummy)
+                    #    cmd = f"cat dummy | sed -e 's|/L72/|/L{self.agcm_lm}/|g' | sed -e 's|z72|z{self.agcm_lm}|g' > {src}"
+                    #    print(cmd)
+                    #    get_cmd_std(cmd,wkdir=self.scrdir)
+                        
+        # Rename big ExtData files that are not needed                    
+        ExtData_opt_files = {"ENABLE_STRATCHEM":   "StratChem_ExtData.rc", \
+                             "ENABLE_GMICHEM":     "GMI_ExtData.rc", \
+                             "ENABLE_GEOSCHEM":    "GEOSCHEMchem_ExtData.rc", \
+                             "ENABLE_CARMA":       "CARMAchem_GridComp_ExtData.rc", \
+                             "ENABLE_DNA":         "DNA_ExtData.rc", \
+                             "ENABLE_ACHEM":       "GEOSachem_ExtData.rc", \
+                             "ENABLE_GOCART_DATA": "GOCARTdata_ExtData.rc"}
+        for opt in ExtData_opt_files.keys():
+            cmd = f"grep -i '^\s*{opt}:\s*\.TRUE\.' GEOS_ChemGridComp.rc | wc -l"
+            opt_true = int(get_cmd_out(cmd,wkdir=self.scrdir))
+            if opt_true == 0 and os.path.exists( os.path.join(self.scrdir, ExtData_opt_files[opt]) ):
+                src = os.path.join(self.scrdir, ExtData_opt_files[opt])
+                dst = os.path.join(self.scrdir, ExtData_opt_files[opt]+".NOT_USED")
+                #print("rename: src",src,": dst", dst)
+                os.rename(src,dst)
+
+        # 1MOM and GFDL microphysics do not use WSUB_NATURE
+        if extdata2g_true == 0: 
+            src = os.path.join(self.scrdir,"WSUB_ExtData.rc")
+            dst = os.path.join(self.scrdir,"WSUB_ExtData.tmp")
+            os.rename(src, dst)
+            cmd = "cat WSUB_ExtData.tmp | sed -e '/^WSUB_NATURE/ s#ExtData.*#/dev/null#' > WSUB_ExtData.rc"
+            get_cmd_out(cmd, wkdir=self.scrdir)
+        else:
+            src = os.path.join(self.scrdir,"WSUB_ExtData.yaml")
+            dst = os.path.join(self.scrdir,"WSUB_ExtData.tmp")
+            os.rename(src, dst)
+            cmd = "cat WSUB_ExtData.tmp | sed -e '/collection:/ s#WSUB_Wvar_positive_05hrdeg.*#/dev/null#' > WSUB_ExtData.yaml"
+            get_cmd_out(cmd, wkdir=self.scrdir)
+        os.remove(dst)
+
+        # Generate the complete ExtData.rc
+        if os.path.exists(os.path.join(self.scrdir,"ExtData.rc")):
+            os.remove(os.path.join(self.scrdir,"ExtData.rc"))
+
+        extdata_files = glob.glob(os.path.join(self.scrdir,"*_ExtData.rc"))
+        print(extdata_files)
+
+        if extdata2g_true == 0: 
+            MODIS_Transition_Date = dt.datetime(2021,11,1)
+            if self.emissions == "OPS_EMISSIONS" and MODIS_Transition_Date <= nymdc: 
+                pass
+            else:
+                pass
+
+            
+
+
+
+                    
+
+
+        
+
+        
+
+
 if __name__ == '__main__':
     cfg = ConfigGcmRun()
     cfg.flowdir = "/discover/nobackup/cda/develop_space/geos-workflow"
@@ -529,9 +672,12 @@ if __name__ == '__main__':
                  bcrslv    = "CF0180x6C_DE0360xPE0180", \
                  dateline  = "DC", \
                  emissions = "OPS_EMISSIONS", \
+                 #emissions = "AMIP_EMISSIONS", \
                  abcsdir   = "/discover/nobackup/projects/gmao/ssd/aogcm/atmosphere_bcs/Icarus-NLv3/MOM6/CF0180x6C_TM1440xTM1080_newtopo", \
                  obcsdir   = "/discover/nobackup/projects/gmao/ssd/aogcm/ocean_bcs/MOM6/{}x{}_newtopo".format(cfg.ogcm_im,cfg.ogcm_jm), \
                  sstdir    = "/discover/nobackup/projects/gmao/ssd/aogcm/SST/MERRA2/{}x{}".format(cfg.ogcm_im,cfg.ogcm_jm))
-    cfg.get_exec_rst()
+    #cfg.get_exec_rst()
+    cfg.prepare_extdata()
+    #cfg.run_exec()
     print("="*80+'\n')
     print(cfg)
