@@ -625,19 +625,69 @@ endif
         if os.path.exists(os.path.join(self.scrdir,"ExtData.rc")):
             os.remove(os.path.join(self.scrdir,"ExtData.rc"))
 
-        extdata_files = glob.glob(os.path.join(self.scrdir,"*_ExtData.rc"))
+        #extdata_files = glob.glob(os.path.join(self.scrdir,"*_ExtData.rc")) 
+        extdata_files = get_cmd_out("ls -1 *_ExtData.rc",wkdir=self.scrdir).strip().lstrip().split()
         print(extdata_files)
 
         if extdata2g_true == 0: 
             MODIS_Transition_Date = dt.datetime(2021,11,1)
-            if self.emissions == "OPS_EMISSIONS" and MODIS_Transition_Date <= nymdc: 
-                pass
+            if self.emissions == "OPS_EMISSIONS" and nymdc >= MODIS_Transition_Date: 
+                raise RuntimeError("Not implemented yet. abort...")
+                sys.exit(11)
             else:
-                pass
+                with open(os.path.join(self.scrdir,"ExtData.rc"),"w") as fout:
+                    for rc in extdata_files:
+                        print("append rc file:", rc)
+                        with open(os.path.join(self.scrdir,rc),"r") as fin:
+                            fout.write(fin.read())
 
+        if extdata2g_true == 1:
+            get_cmd_out(f"{self.geosbin}/construct_extdata_yaml_list.py GEOS_ChemGridComp.rc", wkdir=self.scrdir)
+            get_cmd_out("touch ExtData.rc", wkdir=self.scrdir)
+
+
+        # Move GOCART to use RRTMGP bands
+        # skip
+
+
+        # Link Boundary Conditions for Appropriate Date
+        os.environ['YEAR'] = str(nymdc.year)
+        get_cmd_out("./linkbcs",wkdir=self.scrdir)
+
+        if not os.path.exists(os.path.join(self.scrdir, "tile.bin")):
+            cmd = f"{self.geosbin}/binarytile.x tile.data tile.bin"
+            get_cmd_out(cmd, wkdir=self.scrdir, showError=True)
             
+            
+        #########################
+        # Split Saltwater
+        #########################
+        if os.path.exists( os.path.join(self.scrdir,"openwater_internal_rst") ) or \
+           os.path.exists( os.path.join(self.scrdir,"seaicethermo_internal_rst")):
+           print("Saltwater internal state is already split, good to go!")
+        else:
+           raise RuntimeError("Not implemented. Abort...")
+           sys.exit(12)
 
 
+        # Test Openwater Restart for Number of tiles correctness
+        if os.path.exists(os.path.join(self.geosbin, "rs_numtiles.x")) and \
+           os.access(os.path.join(self.geosbin, "rs_numtiles.x"), os.X_OK):
+           print("Testing Openwater")
+           N_OPENW_TILES_EXPECTED = int(get_cmd_out("grep '^\s*0' tile.data | wc -l", wkdir=self.scrdir))
+           cmd = "{} 1 {}/rs_numtiles.x openwater_internal_rst | grep Total | awk '{print $NF}'".format(self.run_cmd, self.geosbin)
+           print("cmd=",cmd)
+           N_OPENW_TILES_FOUND = int(get_cmd_out(cmd, wkdir=self.scrdir))
+           print("N_OPENW_TILES_EXPECTED=",N_OPENW_TILES_EXPECTED)
+           print("N_OPENW_TILES_FOUND=",N_OPENW_TILES_FOUND)
+           if N_OPENW_TILES_EXPECTED != N_OPENW_TILES_FOUND:
+              msg = f"Error! Found {N_OPENW_TILES_FOUND} tiles in openwater. Expect to find {N_OPENW_TILES_EXPECTED} tiles." \
+                     + f"\nYour restarts are probably for a different ocean."
+              raise RuntimeError(msg)
+              sys.exit(13)
+           else:
+              print("Passed test openwater")
+           
 
                     
 
