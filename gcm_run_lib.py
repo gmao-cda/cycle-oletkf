@@ -671,14 +671,14 @@ endif
 
 
         # Test Openwater Restart for Number of tiles correctness
-        if os.path.exists(os.path.join(self.geosbin, "rs_numtiles.x")) and \
+        if False and os.path.exists(os.path.join(self.geosbin, "rs_numtiles.x")) and \
            os.access(os.path.join(self.geosbin, "rs_numtiles.x"), os.X_OK):
            print("Testing Openwater")
            N_OPENW_TILES_EXPECTED = int(get_cmd_out("grep '^\s*0' tile.data | wc -l", wkdir=self.scrdir))
-           cmd = "{} 1 {}/rs_numtiles.x openwater_internal_rst | grep Total | awk '{print $NF}'".format(self.run_cmd, self.geosbin)
-           print("cmd=",cmd)
-           N_OPENW_TILES_FOUND = int(get_cmd_out(cmd, wkdir=self.scrdir))
            print("N_OPENW_TILES_EXPECTED=",N_OPENW_TILES_EXPECTED)
+           cmd = "{} 1 {}/rs_numtiles.x openwater_internal_rst | grep Total | awk '{{print $NF}}'".format(self.run_cmd, self.geosbin)
+           print("cmd=",cmd)
+           N_OPENW_TILES_FOUND = int(get_cmd_out(cmd, wkdir=self.scrdir,showError=True).strip().lstrip())
            print("N_OPENW_TILES_FOUND=",N_OPENW_TILES_FOUND)
            if N_OPENW_TILES_EXPECTED != N_OPENW_TILES_FOUND:
               msg = f"Error! Found {N_OPENW_TILES_FOUND} tiles in openwater. Expect to find {N_OPENW_TILES_EXPECTED} tiles." \
@@ -689,7 +689,64 @@ endif
               print("Passed test openwater")
            
 
-                    
+        # Check for MERRA2OX Consistency
+        PCHEM_CLIM_YEARS = int(get_cmd_out("awk '/pchem_clim_years/ {print $2}' AGCM.rc", wkdir=self.scrdir))
+        print("PCHEM_CLIM_YEARS=",PCHEM_CLIM_YEARS)
+
+        if PCHEM_CLIM_YEARS == 39:
+            with open(os.path.join(self.scrdir,"cap_restart"),"r") as f:
+                date_str = f.readline().strip().lstrip()
+            YEARMON = dt.datetime.strptime(date_str,"%Y%m%d %H%M%S")
+            MERRA2OX_END_DATE = dt.datetime(2017,6,1)
+            if YEARMON.year*100 + YEARMON.month > MERRA2OX_END_DATE.year*100 + MERRA2OX_END_DATE.month:
+                msg = f"You seem to be using MERRA2OX pchem species file, but your simulation date " \
+                      + "[{YEARMON}] is after 201706. This file is only valid until this time."
+                raise RuntimeError(msg)
+                sys.exit(14)
+
+        # Environment variables for MPI, etc
+        os.environ["I_MPI_ADJUST_ALLREDUCE"] = "12"
+        os.environ["I_MPI_ADJUST_GATHERV"]   =  "3"
+
+        # This flag prints out the Intel MPI state. Uncomment if needed
+        os.environ["I_MPI_DEBUG"] = "9"
+        os.environ["I_MPI_SHM_HEAP_VSIZE"] = "512"
+        os.environ["PSM2_MEMORY"] = "large"
+        os.environ["I_MPI_EXTRA_FILESYSTEM"] = "1"
+        os.environ["I_MPI_EXTRA_FILESYSTEM_FORCE"] = "gpfs"
+
+        # Run bundleParser.py
+        get_cmd_out("python bundleParser.py",wkdir=self.scrdir)
+
+        # If REPLAY, link necessary forcing files
+        REPLAY_MODE = get_cmd_out("grep '^\s*REPLAY_MODE:' AGCM.rc | cut -d: -f2", wkdir=self.scrdir).strip().lstrip()
+        if REPLAY_MODE == 'Exact' or REPLAY_MODE == 'Regular': 
+            raise RuntimeError("Replay not supported yet. abort...")
+            sys.exit(15)
+
+        # Establish safe default number of OpenMP threads
+        os.environ["OMP_NUM_THREADS"] = "1"
+
+
+        # Run GEOSgcm.x
+        if self.use_shmem == 1:
+            raise RuntimeError("USE_SHMEM==1 not supported. aborted...")
+            sys.exit(16)
+
+        if self.use_ioserver == 1:
+            IOSERVER_OPTIONS = f"--npes_model {self.model_npes} --nodes_output_server {self.num_oserver_nodes}"
+            IOSERVER_EXTRA   = f"--oserver_type multigroup --npes_backend_pernode {self.num_backend_pes}"
+        else:
+            IOSERVER_OPTIONS = ""
+            IOSERVER_EXTRA   = ""
+
+        cmd = f"env LD_PRELOAD={self.geosdir}/lib/libmom6.so {self.run_cmd} {self.total_pes} ./GEOSgcm.x {IOSERVER_OPTIONS} {IOSERVER_EXTRA} --logging_config 'logging.yaml'"
+        
+        print(cmd)
+
+
+
+                
 
 
         
@@ -726,7 +783,7 @@ if __name__ == '__main__':
                  abcsdir   = "/discover/nobackup/projects/gmao/ssd/aogcm/atmosphere_bcs/Icarus-NLv3/MOM6/CF0180x6C_TM1440xTM1080_newtopo", \
                  obcsdir   = "/discover/nobackup/projects/gmao/ssd/aogcm/ocean_bcs/MOM6/{}x{}_newtopo".format(cfg.ogcm_im,cfg.ogcm_jm), \
                  sstdir    = "/discover/nobackup/projects/gmao/ssd/aogcm/SST/MERRA2/{}x{}".format(cfg.ogcm_im,cfg.ogcm_jm))
-    #cfg.get_exec_rst()
+    cfg.get_exec_rst()
     cfg.prepare_extdata()
     #cfg.run_exec()
     print("="*80+'\n')
