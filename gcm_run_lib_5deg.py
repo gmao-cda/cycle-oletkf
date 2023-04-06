@@ -746,7 +746,7 @@ endif
         cmd = f"env LD_PRELOAD={self.geosdir}/lib/libmom6.so {self.run_cmd} {self.total_pes} ./GEOSgcm.x {IOSERVER_OPTIONS} {IOSERVER_EXTRA} --logging_config 'logging.yaml'"
         
         print(cmd)
-        get_cmd_out(cmd, wkdir=self.scrdir, showError=True)
+        print(get_cmd_out(cmd, wkdir=self.scrdir, showError=True))
 
 
 
@@ -760,7 +760,7 @@ endif
 
 if __name__ == '__main__':
     cfg = ConfigGcmRun()
-    cfg.flowdir = "/discover/nobackup/cda/develop_space/geos-workflow"
+    cfg.flowdir = "/discover/nobackup/cda/develop_space/cycle-oletkf"
     cfg.flowdir = os.path.abspath(cfg.flowdir)
 
     cfg.load_g5modules(site = "NCCS")
@@ -771,9 +771,9 @@ if __name__ == '__main__':
                      geosutil = "/gpfsm/dnb06/projects/p179/cda/GEOSgcm_08Nov2022/install")
     #print(os.environ["LD_LIBRARY_PATH"])
     #print(os.environ["LD_LIBRARY64_PATH"])
-    cfg.set_exp_vars(expid  = "5deg_run_python", \
-                     expdir = "/discover/nobackup/cda/projects/5deg_run_python", \
-                     homdir = "/discover/nobackup/cda/projects/5deg_run_python")
+    cfg.set_exp_vars(expid  = "5deg_test2_python", \
+                     expdir = "/discover/nobackup/cda/projects/5deg_test2_python", \
+                     homdir = "/discover/nobackup/cda/projects/5deg_test2_python")
     cfg.create_exp_subdirs()
     cfg.set_exp_run_params(ncpus=40, ncpus_per_node=40)
     cfg.prepare_fixed_files()

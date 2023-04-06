@@ -3,6 +3,7 @@ import numpy as np
 import datetime as dt
 import argparse, os
 from netCDF4 import Dataset
+import glob
 
 def get_rst_list():
     flist = ["achem_internal_rst", "aiau_import_rst", "cabc_internal_rst", "cabr_internal_rst", "caoc_internal_rst",\
@@ -14,8 +15,14 @@ def get_rst_list():
              "tr_import_rst", "tr_internal_rst", "turb_import_rst", "turb_internal_rst"]
     return flist
 
-def get_MOMres_list():
-    flist = ["RESTART/MOM.res_1.nc", "RESTART/MOM.res_2.nc", "RESTART/MOM.res_3.nc", "RESTART/MOM.res.nc"]
+def get_MOMres_list(path):
+    #flist = ["RESTART/MOM.res_1.nc", "RESTART/MOM.res_2.nc", "RESTART/MOM.res_3.nc", "RESTART/MOM.res.nc"]
+    path = os.path.abspath(path)
+    flist = glob.glob(os.path.join(path, "MOM*.nc"))
+    print("num of MOM files=", len(flist))
+    for f in flist:
+        print( "MOM FILE: {}".format(f))
+
     return flist
 
 def get_mom6_restime(mdays):
@@ -78,8 +85,8 @@ def revise_time_stamp(wkdir, start_date=dt.datetime(2010,1,1), end_date=dt.datet
 
     # revise MOM6 time stamp
     print("="*80+"\n4. revise timestamp of MOM6 restart files\n")
-    for fn in get_MOMres_list():
-        print("revise {}".format(os.path.join(wkdir,fn)))
+    for fn in get_MOMres_list(os.path.join(wkdir,"RESTART")):
+        print("revise {}".format(os.path.join(wkdir,"RESTART",os.path.basename(fn))))
         ds = Dataset(os.path.join(wkdir,fn),"r+")
         mdays = ds.variables['Time'][:]
         print("original MOM6 date is", get_mom6_restime(mdays[0]))

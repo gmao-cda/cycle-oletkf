@@ -324,8 +324,7 @@ class ConfigGcmRun(Config):
 
         linkbcs_path = os.path.join(self.scrdir, "linkbcs")
         if os.path.exists(linkbcs_path): os.remove(linkbcs_path)
-        msg = f"""
-#!/bin/csh -f
+        msg = f"""#!/bin/csh -f
 
 /bin/mkdir -p RESTART
 /bin/mkdir -p            ExtData
@@ -741,8 +740,9 @@ endif
             IOSERVER_EXTRA   = ""
 
         cmd = f"env LD_PRELOAD={self.geosdir}/lib/libmom6.so {self.run_cmd} {self.total_pes} ./GEOSgcm.x {IOSERVER_OPTIONS} {IOSERVER_EXTRA} --logging_config 'logging.yaml'"
-        
+
         print(cmd)
+        #print(get_cmd_out(cmd, wkdir=self.scrdir, showError=True))
 
 
 
@@ -756,7 +756,7 @@ endif
 
 if __name__ == '__main__':
     cfg = ConfigGcmRun()
-    cfg.flowdir = "/discover/nobackup/cda/develop_space/geos-workflow"
+    cfg.flowdir = "/discover/nobackup/cda/develop_space/cycle-oletkf"
     cfg.flowdir = os.path.abspath(cfg.flowdir)
 
     cfg.load_g5modules(site = "NCCS")
@@ -767,9 +767,9 @@ if __name__ == '__main__':
                      geosutil = "/gpfsm/dnb06/projects/p179/cda/GEOSgcm_08Nov2022/install")
     #print(os.environ["LD_LIBRARY_PATH"])
     #print(os.environ["LD_LIBRARY64_PATH"])
-    cfg.set_exp_vars(expid  = "test_code", \
-                     expdir = "/discover/nobackup/cda/projects/test_code", \
-                     homdir = "/discover/nobackup/cda/projects/test_code")
+    cfg.set_exp_vars(expid  = "0d25_run_python1", \
+                     expdir = "/discover/nobackup/cda/projects/0d25_run_python1", \
+                     homdir = "/discover/nobackup/cda/projects/0d25_run_python1")
     cfg.create_exp_subdirs()
     cfg.set_exp_run_params(ncpus=45*27, ncpus_per_node=45)
     cfg.prepare_fixed_files()
