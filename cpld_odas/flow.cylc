@@ -1,0 +1,31 @@
+#!jinja2
+[scheduler]
+    UTC mode = True
+[scheduling]
+    initial cycle point = 2000-01-01T00Z
+    final cycle point = 2000-01-01T03Z
+    [[graph]]
+        T00/PT3H = """
+            test_mpi
+        """
+
+[runtime]
+    [[test_mpi]]
+        platform = discover
+        execution time limit = PT05M
+        script = """
+cd /discover/nobackup/cda/projects/test_mpi/mem001
+echo THIS_IS_A_TEST
+cat /proc/cpuinfo | grep processor|tail -1|cut -d: -f2
+uname -a
+
+mydev
+mpirun -n 26 ./a.out
+"""
+        [[[directives]]]
+            --nodes = 1
+            --account = s2647
+
+
+
+#{% include 'etc/python-job.settings' %}
