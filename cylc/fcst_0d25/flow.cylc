@@ -1,0 +1,33 @@
+#!jinja2
+[scheduler]
+    UTC mode = True
+[scheduling]
+    initial cycle point = 2000-01-01T00Z
+    final cycle point = 2000-01-01T00Z
+    [[graph]]
+        T00/PT6H = """
+            geos_run
+        """
+
+[runtime]
+    [[geos_run]]
+        platform = discover
+        execution time limit = PT30M
+        script = """
+umask 022
+ulimit -s unlimited
+module use -a ~sakella/modulefiles
+module load python/cycl-22Feb2023
+ml
+cd /discover/nobackup/cda/develop_space/cycle-oletkf
+python3 gcm_run_lib.py
+"""
+        [[[directives]]]
+            --nodes = 27
+            --ntasks-per-node = 45
+            --constraint = cas
+            --account = s2647
+
+
+
+#{% include 'etc/python-job.settings' %}

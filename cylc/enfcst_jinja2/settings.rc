@@ -1,0 +1,2 @@
+{% set MEMBERS = 10 %}
+{% set LIB_SRCS = "/home/cda/cylc-src/cylc-jinja2/bin" %}

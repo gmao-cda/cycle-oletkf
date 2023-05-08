@@ -1,10 +1,81 @@
+#!/usr/bin/env python3
+
 #import numpy as np
 #import datetime as dt
 import os, sys, shutil, platform, glob
 import datetime as dt
 import subprocess as sp
-from config_tools import Config
-from env_modules_python import module  #lmod
+#from config_tools import Config
+#from env_modules_python import module  #lmod
+import yaml
+
+#from __future__ import print_function
+from subprocess import PIPE, Popen
+
+
+def module(command, *arguments, **kwargs):
+    """
+    Execute a regular Lmod command and apply environment changes to
+    the current Python environment (i.e. os.environ).
+
+    In case len(arguments) == 1 the string will be split on whitespace into
+    separate arguments. Pass a list of strings to avoid this.
+
+    Raises an exception in case Lmod execution returned a non-zero
+    exit code.
+
+    Use with keyword argument show_environ_updates=True to show the actual
+    changes made to os.environ (mostly for debugging).
+
+    Examples:
+    module('list')
+    module('load', 'gcc')
+    module('load', 'gcc cmake')
+    module('load', 'gcc cmake', show_environ_updates=True)
+    """
+    numArgs = len(arguments)
+    A = ['/usr/share/lmod/lmod/libexec/lmod', 'python', command]
+    if (numArgs == 1):
+        A += arguments[0].split()
+    else:
+        A += list(arguments)
+
+    proc           = Popen(A, stdout=PIPE, stderr=PIPE)
+    status         = proc.returncode
+    stdout, stderr = proc.communicate()
+    err_out        = sys.stderr
+    if (os.environ.get('LMOD_REDIRECT','@redirect@') != 'no'):
+        err_out=sys.stdout
+
+    print(stderr.decode(),file=err_out)
+
+    if ('show_environ_updates' in kwargs):
+        print(stdout.decode())
+    exec(stdout.decode())
+    return status, stderr.decode()
+
+class Config:
+    def __init__(self):
+        pass
+
+    def __str__(self):
+        info="\n"
+        for att in self.__dict__:
+            info+="{} = {} \n".format(att,self.__dict__[att])
+        return info
+
+    def read_cfg(self, fnin, namelist="merge"):
+        with open(fnin,"r") as f:
+            cfg = yaml.safe_load(f)
+
+        for att in cfg[namelist].keys():
+            if hasattr(self, att):
+               setattr(self, att, cfg[namelist][att])
+            else:
+               raise RuntimeError("Class ({}) does not have attribute ({})".format(type(self).__name__, att))
+               sys.exit(146)
+        print(self)
+
 
 def calc_num_model_nodes(model_npes, ncpus_per_node):
     x = model_npes / ncpus_per_node
@@ -760,31 +831,5 @@ if __name__ == '__main__':
     cfg.flowdir = os.path.abspath(cfg.flowdir)
 
     cfg.load_g5modules(site = "NCCS")
-    cfg.set_env_vars(site     = "NCCS", \
-                     geosdir  = "/gpfsm/dnb06/projects/p179/cda/GEOSgcm_08Nov2022/install", \
-                     geosbin  = "/gpfsm/dnb06/projects/p179/cda/GEOSgcm_08Nov2022/install/bin", \
-                     geosetc  = "/gpfsm/dnb06/projects/p179/cda/GEOSgcm_08Nov2022/install/etc", \
-                     geosutil = "/gpfsm/dnb06/projects/p179/cda/GEOSgcm_08Nov2022/install")
-    #print(os.environ["LD_LIBRARY_PATH"])
-    #print(os.environ["LD_LIBRARY64_PATH"])
-    cfg.set_exp_vars(expid  = "cylc_0d25", \
-                     expdir = "/discover/nobackup/cda/projects/cylc_0d25", \
-                     homdir = "/discover/nobackup/cda/projects/cylc_0d25")
-    cfg.create_exp_subdirs()
-    cfg.set_exp_run_params(ncpus=45*27, ncpus_per_node=45)
-    cfg.prepare_fixed_files()
-    cfg.create_history_collection()
-    cfg.link_bcs(bcsdir    = "/discover/nobackup/ltakacs/bcs/Icarus-NLv3/Icarus-NLv3_Reynolds", \
-                 chmdir    = "/discover/nobackup/projects/gmao/share/gmao_ops/fvInput_nc3", \
-                 bcrslv    = "CF0180x6C_DE0360xPE0180", \
-                 dateline  = "DC", \
-                 emissions = "OPS_EMISSIONS", \
-                 #emissions = "AMIP_EMISSIONS", \
-                 abcsdir   = "/discover/nobackup/projects/gmao/ssd/aogcm/atmosphere_bcs/Icarus-NLv3/MOM6/CF0180x6C_TM1440xTM1080_newtopo", \
-                 obcsdir   = "/discover/nobackup/projects/gmao/ssd/aogcm/ocean_bcs/MOM6/{}x{}_newtopo".format(cfg.ogcm_im,cfg.ogcm_jm), \
-                 sstdir    = "/discover/nobackup/projects/gmao/ssd/aogcm/SST/MERRA2/{}x{}".format(cfg.ogcm_im,cfg.ogcm_jm))
-    cfg.get_exec_rst()
-    cfg.prepare_extdata()
-    #cfg.run_exec()
-    print("="*80+'\n')
-    print(cfg)
+    wkdir = "/discover/nobackup/cda/projects/test_mpi/mem001"
+    print(get_cmd_out("mpirun -n 26 ./a.out", wkdir=wkdir, showError=True))
