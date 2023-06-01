@@ -1,6 +1,6 @@
 VERSION: 1
-EXPID: test_flow_base_clone2
-EXPDSC: test_flow_base_clone2
+EXPID: @GEOS_CDA_EXPID@
+EXPDSC: @GEOS_CDA_EXPID@
 EXPSRC: GEOSgcm-v10.23.0
 
 
