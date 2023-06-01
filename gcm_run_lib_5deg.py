@@ -771,11 +771,11 @@ if __name__ == '__main__':
                      geosutil = "/gpfsm/dnb06/projects/p179/cda/GEOSgcm_08Nov2022/install")
     #print(os.environ["LD_LIBRARY_PATH"])
     #print(os.environ["LD_LIBRARY64_PATH"])
-    cfg.set_exp_vars(expid  = "5deg_test2_python", \
-                     expdir = "/discover/nobackup/cda/projects/5deg_test2_python", \
-                     homdir = "/discover/nobackup/cda/projects/5deg_test2_python")
+    cfg.set_exp_vars(expid  = "fcst0001", \
+                     expdir = "/discover/nobackup/cda/projects/letkf_exp/fcst0001", \
+                     homdir = "/discover/nobackup/cda/projects/letkf_exp/fcst0001")
     cfg.create_exp_subdirs()
-    cfg.set_exp_run_params(ncpus=40, ncpus_per_node=40)
+    cfg.set_exp_run_params(ncpus=40, ncpus_per_node=40) #skylake: 40, cascade: 45
     cfg.prepare_fixed_files()
     cfg.create_history_collection()
     cfg.link_bcs(bcsdir    = "/discover/nobackup/ltakacs/bcs/Icarus-NLv3/Icarus-NLv3_Reynolds", \

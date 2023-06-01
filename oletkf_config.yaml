@@ -1,0 +1,4 @@
+initial_ensemble_mapping:
+    member0001: "/discover/nobackup/cda/projects/5deg/restarts/restarts.e20160101_06z.tar"
+    member0002: "/discover/nobackup/cda/projects/5deg/restarts/restarts.e20160101_12z.tar"
+    member0003: "/discover/nobackup/cda/projects/5deg/restarts/restarts.e20160101_18z.tar"
