@@ -1,31 +1,78 @@
 #!jinja2
+%include settings.rc
+
 [scheduler]
     UTC mode = True
 [scheduling]
-    initial cycle point = 2000-01-01T00Z
-    final cycle point = 2000-01-01T03Z
+    initial cycle point = {{INITIAL_CYCLE_POINT}}
+    final cycle point = {{FINAL_CYCLE_POINT}}
     [[graph]]
-        T00/PT3H = """
-            test_mpi
-        """
+        PT6H = """
+            {% for imem in range(1,MEMBERS+1) %}
+            prep_geos_fcst_{{imem}} => geos_fcst_{{imem}} => run_obsop_{{imem}} => run_letkf 
+            {% endfor %}
+                """
+        +PT6H/PT6H = """
+            {% for imem in range(1,MEMBERS+1) %}
+            run_letkf[-PT6H] => prep_geos_fcst_{{imem}}
+            {% endfor %}
+
+                    """
 
 [runtime]
-    [[test_mpi]]
-        platform = discover
-        execution time limit = PT05M
+
+    #---------------------------------------------------------------------------
+    # prepare exp dir
+    #
+    {% for imem in range(1,MEMBERS+1) %}
+    [[prep_geos_fcst_{{imem}}]]
         script = """
-cd /discover/nobackup/cda/projects/test_mpi/mem001
-echo THIS_IS_A_TEST
-cat /proc/cpuinfo | grep processor|tail -1|cut -d: -f2
-uname -a
+                 echo "prep_geos_fcst ${C4MEM} $CYCLE_NAME"
+                 {{CYCLE_LETKF_SRCS}}/prep_geos_fcst.py {{SHARED_TMP_DIR}}/fcst${C4MEM} \
+                 --exp_template {{CYCLE_LETKF_SRCS}}/exp_template/exp_template_5deg  \
+                 --cycleBkgdDir {{EXP_DIR}}/bkgd/${C4MEM}/${CYCLE_NAME} \
+                 --cycleAnalDir {{EXP_DIR}}/anal/${C4MEM}/${CYCLE_NAME}
+                 """
+        [[[environment]]]
+        CYCLE_NAME=$(cylc cycle-point --template=%Y%m%dT%H)
+        C4MEM=$(printf "%4.4d" {{imem}})
 
-mydev
-mpirun -n 26 ./a.out
-"""
-        [[[directives]]]
-            --nodes = 1
-            --account = s2647
+    {% endfor %}
 
+    #---------------------------------------------------------------------------
+    # forecast job
+    #
+    {% for imem in range(1,MEMBERS+1) %}
+    [[geos_fcst_{{imem}}]]
+        script = """
+                 echo "geos_fcst {{imem}} $CYCLE_NAME"
+                 """
+        [[[environment]]]
+        CYCLE_NAME=$(cylc cycle-point --template=%Y%m%dT%H)
 
+    {% endfor %}
+ 
+    #---------------------------------------------------------------------------
+    # run obsop
+    #
+    {% for imem in range(1,MEMBERS+1) %}
+    [[run_obsop_{{imem}}]]
+        script = """
+                 echo "run_obsop {{imem}} $CYCLE_NAME"
+                 """
+        [[[environment]]]
+        CYCLE_NAME=$(cylc cycle-point --template=%Y%m%dT%H)
 
-#{% include 'etc/python-job.settings' %}
+    {% endfor %}
+
+    #---------------------------------------------------------------------------
+    # run letkf
+    #
+    [[run_letkf]]
+        script = """
+                 echo "run_letkf $CYCLE_NAME"
+                 """
+        [[[environment]]]
+        CYCLE_NAME=$(cylc cycle-point --template=%Y%m%dT%H)
+
+ 
