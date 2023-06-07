@@ -8,8 +8,8 @@ def parse_cmd_line():
     parser = argparse.ArgumentParser(description=("Generate an empty oletkf output directory"))
     parser.add_argument("expdir", help=("directory prepared by gcm_setup"))
     parser.add_argument("--members", required=True, default=10, type=int, help=("number of members"))
-    parser.add_argument("--start_date", required=True, default="201901010000", help=("yyyymmddHH"))
-    parser.add_argument("--end_date", default=None, help=("yyyymmddHH"))
+    parser.add_argument("--startDate", required=True, default="201901010000", help=("yyyymmddHH"))
+    parser.add_argument("--endDate", default=None, help=("yyyymmddHH"))
     parser.add_argument("--tinc", default=6, type=int, help=("time interval between two day cycles (unit: hours)"))
     args = parser.parse_args()
 
@@ -17,11 +17,11 @@ def parse_cmd_line():
     if args.members < 0:
         raise RuntimeError("members ({}) <0. exit...".format(members))
         sys.exit(1)
-    args.start_date = dt.datetime.strptime(args.start_date,"%Y%m%d%H")
-    if args.end_date is None:
-        args.end_date = args.start_date
+    args.startDate = dt.datetime.strptime(args.startDate,"%Y%m%d%H")
+    if args.endDate is None:
+        args.endDate = args.startDate
     else:
-        args.end_date = dt.datetime.strptime(args.end_date,"%Y%m%d%H") 
+        args.endDate = dt.datetime.strptime(args.endDate,"%Y%m%d%H") 
     args.tinc = dt.timedelta(hours=args.tinc)
     
     print(args)
@@ -74,6 +74,6 @@ if __name__ == '__main__':
     args = parse_cmd_line()
     generate_output_directory(args.expdir, \
                               args.members, \
-                              args.start_date, \
-                              args.end_date, \
+                              args.startDate, \
+                              args.endDate, \
                               args.tinc)
