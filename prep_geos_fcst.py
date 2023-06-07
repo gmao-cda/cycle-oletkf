@@ -14,16 +14,18 @@ def run_shell_cmd(cmd, wkdir, showError=False):
 def parse_cmd_line():
     parser = argparse.ArgumentParser(description=("Prepare a directory to start GEOS-ESM forecast"))
     parser.add_argument("wkdir", help=("where to run fcst"))
-    parser.add_argument("--exp_template", required=True, default=None, help=("experiment template"))
-    parser.add_argument("--cycleAnalDir", required=True, default=None, help=("experiment template"))
-    parser.add_argument("--cycleBkgdDir", required=True, default=None, help=("experiment template"))
+    parser.add_argument("--expTplDir", required=True, default=None, help=("experiment template"))
+    parser.add_argument("--cycleAnalDir", required=True, default=None, help=("analDir storing analyzed files "))
+    parser.add_argument("--cycleBkgdDir", required=True, default=None, help=("bkgdDir storing other files to run GEOSgcm"))
+    parser.add_argument("--fwdExec", required=True, default="./GEOSgcm.x", help=("path where GEOSgcm.x is"))
 
     args = parser.parse_args()
 
-    args.wkdir = os.path.abspath(args.wkdir)
-    args.exp_template = os.path.abspath(args.exp_template)
+    args.wkdir        = os.path.abspath(args.wkdir)
+    args.expTplDir    = os.path.abspath(args.expTplDir)
     args.cycleAnalDir = os.path.abspath(args.cycleAnalDir)
     args.cycleBkgdDir = os.path.abspath(args.cycleBkgdDir)
+    args.fwdExec      = os.path.abspath(args.fwdExec)
     
     print(args)
     return args
@@ -31,7 +33,8 @@ def parse_cmd_line():
 def prep_geos_fcst_dir(wkdir=None, \
                        expTplDir=None, \
                        cycleAnalDir=None, \
-                       cycleBkgdDir=None):
+                       cycleBkgdDir=None, \
+                       fwdExec="./GEOSgcm.x"):
 
 
     if not os.path.exists(expTplDir):
@@ -73,6 +76,14 @@ def prep_geos_fcst_dir(wkdir=None, \
     #if os.path.exists(fpath):
     with open(fpath,"w") as f:
         f.write(wkdir+"\n")
+
+
+    # copy the forward model (e.g., GEOSgcm.x) to the experiment dir
+    if not os.path.exists(args.fwdExec):
+        raise RuntimeError("gcm executable does not exist at {}".format(args.fwdExec))
+        sys.exit(1)
+    execName = os.path.basename(args.fwdExec)
+    shutil.copy2(args.fwdExec, os.path.join(wkdir,execName))
     
 
 
@@ -83,6 +94,7 @@ def prep_geos_fcst_dir(wkdir=None, \
 if __name__ == '__main__':
     args = parse_cmd_line()
     prep_geos_fcst_dir(args.wkdir, \
-                       args.exp_template, \
+                       args.expTplDir, \
                        args.cycleAnalDir, \
-                       args.cycleBkgdDir)
+                       args.cycleBkgdDir, \
+                       args.fwdExec)

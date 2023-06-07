@@ -29,9 +29,10 @@
         script = """
                  echo "prep_geos_fcst ${C4MEM} $CYCLE_NAME"
                  {{CYCLE_LETKF_SRCS}}/prep_geos_fcst.py {{SHARED_TMP_DIR}}/fcst${C4MEM} \
-                 --exp_template {{CYCLE_LETKF_SRCS}}/exp_template/exp_template_5deg  \
+                 --expTplDir {{CYCLE_LETKF_SRCS}}/exp_template/exp_template_5deg  \
                  --cycleBkgdDir {{EXP_DIR}}/bkgd/${C4MEM}/${CYCLE_NAME} \
-                 --cycleAnalDir {{EXP_DIR}}/anal/${C4MEM}/${CYCLE_NAME}
+                 --cycleAnalDir {{EXP_DIR}}/anal/${C4MEM}/${CYCLE_NAME} \
+                 --fwdExec {{FWD_EXEC}}
                  """
         [[[environment]]]
         CYCLE_NAME=$(cylc cycle-point --template=%Y%m%dT%H)
