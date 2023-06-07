@@ -9,6 +9,7 @@
 {% set EXP_DIR="/discover/nobackup/cda/projects/test_cylc/test_prep_bkgd" %}
 {% set INITIAL_CYCLE_POINT = "2022-01-01T00Z" %}
 {% set FINAL_CYCLE_POINT = "2022-01-01T00Z" %}
+{% set FCST_HRS = 6 %}
 
 {% set SHARED_TMP_DIR="/discover/nobackup/cda/projects2/tmp" %}
 

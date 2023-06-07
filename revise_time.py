@@ -55,7 +55,6 @@ def revise_time_stamp(wkdir, start_date=dt.datetime(2010,1,1), end_date=dt.datet
     # revise CAP.rc
     print("="*80+"\n2. revise timestamp of CAP.rc\n" )
     if os.path.exists(os.path.join(wkdir, "CAP.rc")):
-        fn_new = "cap_restart.original"
         with open(os.path.join(wkdir,"CAP.rc"), "r") as f:
             lines = f.readlines()
 
