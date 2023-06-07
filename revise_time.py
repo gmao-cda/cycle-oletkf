@@ -87,14 +87,14 @@ def revise_time_stamp(wkdir, start_date=dt.datetime(2010,1,1), end_date=dt.datet
     print("="*80+"\n4. revise timestamp of MOM6 restart files\n")
     for fn in get_MOMres_list(os.path.join(wkdir,"RESTART")):
         print("revise {}".format(os.path.join(wkdir,"RESTART",os.path.basename(fn))))
-        ds = Dataset(os.path.join(wkdir,fn),"r+")
+        ds = Dataset(fn,"r+")
         mdays = ds.variables['Time'][:]
         print("original MOM6 date is", get_mom6_restime(mdays[0]))
         mdays_new = get_mom6_mdays(start_date)
         ds.variables['Time'][:] = np.array([mdays_new],dtype="f8")
         ds.close()
 
-        ds = Dataset(os.path.join(wkdir,fn),"r")
+        ds = Dataset(fn,"r")
         mdays = ds.variables['Time'][:]
         print("the revised MOM6 date is", get_mom6_restime(mdays[0]))
         ds.close()
