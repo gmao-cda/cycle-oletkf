@@ -47,11 +47,37 @@
     #
     {% for imem in range(1,MEMBERS+1) %}
     [[geos_fcst_{{imem}}]]
+        platform = discover
+        execution time limit = PT10M
         script = """
                  echo "geos_fcst {{imem}} $CYCLE_DATE"
+
+                 umask 022
+                 ulimit -s unlimited
+                 module use -a ~sakella/modulefiles
+                 module load python/17May2023
+                 ml
+
+                 PYTHONPATH={{CYCLE_LETKF_SRCS}} {{CYCLE_LETKF_SRCS}}/gcm_run_lib_5deg_v2.py {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst${C4MEM} \
+                 --flowDir {{CYCLE_LETKF_SRCS}} \
+                 --geosDir {{GEOS_DIR}} \
+                 --site {{SITE}} \
+                 --ncpus 40 \
+                 --ncpusPerNode 40 \
+                 --bkgdSaveDir {{EXP_DIR}}/bkgd/${C4MEM}/${NEXT_CYCLE_DATE}
+
+                 echo "{{EXP_DIR}}/bkgd/${C4MEM}/${NEXT_CYCLE_DATE}"
                  """
         [[[environment]]]
         CYCLE_DATE=$(cylc cycle-point --template=%Y%m%dT%H)
+        NEXT_CYCLE_DATE=$(cylc cycle-point --offset-hours=6 --template=%Y%m%dT%H)
+        C4MEM=$(printf "%4.4d" {{imem}})
+
+        [[[directives]]]
+            --nodes = 1
+            --ntasks-per-node = 40
+            --constraint = sky
+            --account = s2647
 
     {% endfor %}
  
