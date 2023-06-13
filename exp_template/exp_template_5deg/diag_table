@@ -14,7 +14,9 @@
 "forcing",  -1,"months",1,"days","Time",
 #"surface",  1,"months",1,"days","Time",
 "sfc_ave",  -1,"months",1,"days","Time",
-#"ocean_static",       -1,"days",1,"days","time",
+
+"ocean_hourly%4yr%2mo%2dy%2hr",1,"hours",1,"hours","time",1,"hours",
+"ocean_static",       -1,"days",1,"days","time",
 #
 #"cmor",               1,"days",1,"days","Time",
 #"cmor2",              1,"days",1,"days","Time",
@@ -31,6 +33,18 @@
 #
 ## Prognostic Ocean fields:
 ##=========================
+'ocean_model','h','h','ocean_hourly%4yr%2mo%2dy%2hr','all','none','none',2
+'ocean_model','temp','temp','ocean_hourly%4yr%2mo%2dy%2hr','all','none','none',2
+'ocean_model','salt','salt','ocean_hourly%4yr%2mo%2dy%2hr','all','none','none',2
+'ocean_model','u','u','ocean_hourly%4yr%2mo%2dy%2hr','all','none','none',2
+'ocean_model','v','v','ocean_hourly%4yr%2mo%2dy%2hr','all','none','none',2
+'ocean_model','ssh','ssh','ocean_hourly%4yr%2mo%2dy%2hr','all','none','none',2
+'ocean_model','sst','sst','ocean_hourly%4yr%2mo%2dy%2hr','all','none','none',2
+'ocean_model','sss','sss','ocean_hourly%4yr%2mo%2dy%2hr','all','none','none',2
+'ocean_model','ssu','ssu','ocean_hourly%4yr%2mo%2dy%2hr','all','none','none',2
+'ocean_model','ssv','ssv','ocean_hourly%4yr%2mo%2dy%2hr','all','none','none',2
+
+
 #
 #"ocean_model","u","u","prog","all",.false.,"none",2
 #"ocean_model","v","v","prog","all",.false.,"none",2
@@ -431,27 +445,27 @@
 #
 ## Static ocean fields:
 ##=====================
-#"ocean_model", "geolon",      "geolon",      "ocean_static", "all", .false., "none", 1
-#"ocean_model", "geolat",      "geolat",      "ocean_static", "all", .false., "none", 1
-#"ocean_model", "geolon_c",    "geolon_c",    "ocean_static", "all", .false., "none", 2
-#"ocean_model", "geolat_c",    "geolat_c",    "ocean_static", "all", .false., "none", 2
-#"ocean_model", "geolon_u",    "geolon_u",    "ocean_static", "all", .false., "none", 2
-#"ocean_model", "geolat_u",    "geolat_u",    "ocean_static", "all", .false., "none", 2
-#"ocean_model", "geolon_v",    "geolon_v",    "ocean_static", "all", .false., "none", 2
-#"ocean_model", "geolat_v",    "geolat_v",    "ocean_static", "all", .false., "none", 2
-#"ocean_model", "area_t",      "area_t",      "ocean_static", "all", .false., "none", 1
-#"ocean_model", "depth_ocean", "depth_ocean", "ocean_static", "all", .false., "none", 2
-#"ocean_model", "wet",         "wet",         "ocean_static", "all", .false., "none", 1
-#"ocean_model", "wet_c",       "wet_c",       "ocean_static", "all", .false., "none", 2
-#"ocean_model", "wet_u",       "wet_u",       "ocean_static", "all", .false., "none", 2
-#"ocean_model", "wet_v",       "wet_v",       "ocean_static", "all", .false., "none", 2
-#"ocean_model", "Coriolis",    "Coriolis",    "ocean_static", "all", .false., "none", 2
-#"ocean_model", "dxt",         "dxt",         "ocean_static", "all", .false., "none", 2
-#"ocean_model", "dyt",         "dyt",         "ocean_static", "all", .false., "none", 2
-#"ocean_model", "dxCu",        "dxCu",        "ocean_static", "all", .false., "none", 2
-#"ocean_model", "dyCu",        "dyCu",        "ocean_static", "all", .false., "none", 2
-#"ocean_model", "dxCv",        "dxCv",        "ocean_static", "all", .false., "none", 2
-#"ocean_model", "dyCv",        "dyCv",        "ocean_static", "all", .false., "none", 2
+"ocean_model", "geolon",      "geolon",      "ocean_static", "all", .false., "none", 1
+"ocean_model", "geolat",      "geolat",      "ocean_static", "all", .false., "none", 1
+"ocean_model", "geolon_c",    "geolon_c",    "ocean_static", "all", .false., "none", 2
+"ocean_model", "geolat_c",    "geolat_c",    "ocean_static", "all", .false., "none", 2
+"ocean_model", "geolon_u",    "geolon_u",    "ocean_static", "all", .false., "none", 2
+"ocean_model", "geolat_u",    "geolat_u",    "ocean_static", "all", .false., "none", 2
+"ocean_model", "geolon_v",    "geolon_v",    "ocean_static", "all", .false., "none", 2
+"ocean_model", "geolat_v",    "geolat_v",    "ocean_static", "all", .false., "none", 2
+"ocean_model", "area_t",      "area_t",      "ocean_static", "all", .false., "none", 1
+"ocean_model", "depth_ocean", "depth_ocean", "ocean_static", "all", .false., "none", 2
+"ocean_model", "wet",         "wet",         "ocean_static", "all", .false., "none", 1
+"ocean_model", "wet_c",       "wet_c",       "ocean_static", "all", .false., "none", 2
+"ocean_model", "wet_u",       "wet_u",       "ocean_static", "all", .false., "none", 2
+"ocean_model", "wet_v",       "wet_v",       "ocean_static", "all", .false., "none", 2
+"ocean_model", "Coriolis",    "Coriolis",    "ocean_static", "all", .false., "none", 2
+"ocean_model", "dxt",         "dxt",         "ocean_static", "all", .false., "none", 2
+"ocean_model", "dyt",         "dyt",         "ocean_static", "all", .false., "none", 2
+"ocean_model", "dxCu",        "dxCu",        "ocean_static", "all", .false., "none", 2
+"ocean_model", "dyCu",        "dyCu",        "ocean_static", "all", .false., "none", 2
+"ocean_model", "dxCv",        "dxCv",        "ocean_static", "all", .false., "none", 2
+"ocean_model", "dyCv",        "dyCv",        "ocean_static", "all", .false., "none", 2
 
 #
 ## Static ocean fields:
