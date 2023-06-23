@@ -93,7 +93,7 @@ def run_single_obsop(wkdir="./", \
     if wkdir != os.path.dirname(hxFile):
         if not os.path.exists( os.path.dirname(hxFile) ):
             print("hxFile dir ({}) does not exist. creat it now.".format(os.path.dirname(hxFile)))
-            os.mkdirs(os.path.dirname(hxFile))
+            os.makedirs(os.path.dirname(hxFile))
 
         shutil.move(os.path.join(wkdir, os.path.basename(hxFile)), hxFile)
     

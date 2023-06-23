@@ -98,7 +98,7 @@
                  --nml        {{CYCLE_LETKF_SRCS}}/cylc/cpld_odas/etc/input.nml.5deg \
                  --bkgdFile   {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst${C4MEM}/scratch/ocean_hourly_${NEXT_CYCLE_YYYY_MM_DD_HH}.nc \
                  --obsFile    /discover/nobackup/cda/projects2/tmp/test_obsop_5deg/SMAP_L2B_SSS_36950_20220101T005200_R18240_V5.0.h5 \
-                 --hxFile     {{EXP_DIR}}/bkgd/${C4MEM}/${NEXT_CYCLE_DATE}/hx_sss.dat \
+                 --hxFile     {{EXP_DIR}}/obsbkgd/${C4MEM}/${NEXT_CYCLE_DATE}/hx_sss.dat \
                  --otherArgs '-olevel 2'
                  """
         [[[environment]]]
