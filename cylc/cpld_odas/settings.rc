@@ -1,13 +1,14 @@
-{% set MEMBERS = 2 %}
-{% set LIB_SRCS = "/discover/nobackup/cda/develop_space/cycle-oletkf/cylc/enfcst_jinja2/bin" %}
 {% set CYCLE_LETKF_SRCS = "/discover/nobackup/cda/develop_space/cycle-oletkf" %}
 
 {% set GEOS_DIR = "/discover/nobackup/projects/gmao/scda_iesa/cda/GEOSgcm_08Nov2022/install" %}
 {% set FWD_EXEC = "/discover/nobackup/projects/gmao/scda_iesa/cda/GEOSgcm_08Nov2022/install/bin/GEOSgcm.x" %}
 {% set SITE = "NCCS" %}
 
+{% set OLETKF_EXEC_DIR = "/discover/nobackup/cda/develop_space/develop_ocean_letkf/Ocean-LETKF-v5/cbuild_esma/src" %}
 
-{% set EXP_DIR="/discover/nobackup/cda/projects2/odas" %}
+
+{% set MEMBERS = 3 %}
+{% set EXP_DIR="/discover/nobackup/cda/projects2/odas3" %}
 {% set INITIAL_CYCLE_POINT = "2017-01-01T00Z" %}
 {% set FINAL_CYCLE_POINT = "2017-01-01T00Z" %}
 {% set FCST_HRS = 6 %}
