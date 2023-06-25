@@ -9,7 +9,7 @@
     [[graph]]
         PT6H = """
             {% for imem in range(1,MEMBERS+1) %}
-            prep_geos_fcst_{{imem}} => geos_fcst_{{imem}} => run_obsop_{{imem}} => run_letkf 
+            prep_geos_fcst_{{imem}} => geos_fcst_{{imem}} => run_obsop_{{imem}} => create_letkf_dir => prep_letkf_{{imem}} => run_letkf 
             {% endfor %}
                 """
         +PT6H/PT6H = """
@@ -95,7 +95,7 @@
                  --rstFile    {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst${C4MEM}/scratch/RESTART/MOM.res.nc \
                  --staticFile {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst${C4MEM}/scratch/ocean_static.nc \
                  --topoFile   {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst${C4MEM}/scratch/INPUT/ocean_topog_Edited.nc \
-                 --nml        {{CYCLE_LETKF_SRCS}}/cylc/cpld_odas/etc/input.nml.5deg \
+                 --nml        {{CYCLE_LETKF_SRCS}}/cylc/cpld_odas/etc/input.nml.obsop.5deg \
                  --bkgdFile   {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst${C4MEM}/scratch/ocean_hourly_${NEXT_CYCLE_YYYY_MM_DD_HH}.nc \
                  --obsFile    /discover/nobackup/cda/projects2/tmp/test_obsop_5deg/SMAP_L2B_SSS_36950_20220101T005200_R18240_V5.0.h5 \
                  --hxFile     {{EXP_DIR}}/obsbkgd/${C4MEM}/${NEXT_CYCLE_DATE}/hx_sss.dat \
