@@ -750,6 +750,11 @@ endif
         print(cmd)
         print(get_cmd_out(cmd, wkdir=self.scrdir, showError=True))
 
+        if os.path.exists(os.path.join(self.scrdir,"EGRESS")):
+            print("\nEGRESS generated. GEOS-ESM run succesfully!")
+        else:
+            raise RuntimeError("EGRESS not generated. GEOS-ESM failed to end without error")
+            sys.exit(17)
                 
 
 

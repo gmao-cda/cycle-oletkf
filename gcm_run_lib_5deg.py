@@ -771,9 +771,12 @@ if __name__ == '__main__':
                      geosutil = "/gpfsm/dnb06/projects/p179/cda/GEOSgcm_08Nov2022/install")
     #print(os.environ["LD_LIBRARY_PATH"])
     #print(os.environ["LD_LIBRARY64_PATH"])
-    cfg.set_exp_vars(expid  = "fcst0001", \
-                     expdir = "/discover/nobackup/cda/projects/letkf_exp/fcst0001", \
-                     homdir = "/discover/nobackup/cda/projects/letkf_exp/fcst0001")
+    expdir = "/discover/nobackup/cda/projects2/tmp/20170101T00_fcst0002"
+    expdir = os.path.abspath(expdir)
+    expid = os.path.basename(expdir)
+    cfg.set_exp_vars(expid  = expid, \
+                     expdir = expdir, \
+                     homdir = expdir)
     cfg.create_exp_subdirs()
     cfg.set_exp_run_params(ncpus=40, ncpus_per_node=40) #skylake: 40, cascade: 45
     cfg.prepare_fixed_files()

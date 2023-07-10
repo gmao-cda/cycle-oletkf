@@ -9,12 +9,16 @@
     [[graph]]
         PT6H = """
             {% for imem in range(1,MEMBERS+1) %}
-            prep_geos_fcst_{{imem}} => geos_fcst_{{imem}} => run_obsop_{{imem}} => create_letkf_dir => prep_letkf_{{imem}} => run_letkf 
+            prep_geos_fcst_{{imem}} => geos_fcst_{{imem}} => save_fcst_{{imem}} 
+
+            save_fcst_{{imem}} => run_obsop_{{imem}} => create_letkf_dir => prep_letkf_{{imem}} => run_letkf 
+
+            run_letkf => save_letkf_{{imem}} => save_letkf_diag
             {% endfor %}
                 """
         +PT6H/PT6H = """
             {% for imem in range(1,MEMBERS+1) %}
-            run_letkf[-PT6H] => prep_geos_fcst_{{imem}}
+            save_letkf_diag[-PT6H] => prep_geos_fcst_{{imem}}
             {% endfor %}
 
                     """
@@ -80,7 +84,26 @@
             --account = {{HPC_GROUP_ACCOUNT}}
 
     {% endfor %}
- 
+     
+    #---------------------------------------------------------------------------
+    # save geos fcst
+    #
+    {% for imem in range(1,MEMBERS+1) %}
+    [[save_fcst_{{imem}}]]
+        script = """
+                 echo "save_geos_fcst ${C4MEM} $CYCLE_DATE"
+                 {{CYCLE_LETKF_SRCS}}/save_geos_fcst.py {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst${C4MEM}/scratch \
+                 {{EXP_DIR}}/bkgd/${C4MEM}/${NEXT_CYCLE_DATE}
+                 """
+
+        [[[environment]]]
+        CYCLE_DATE=$(cylc cycle-point --template=%Y%m%dT%H)
+        NEXT_CYCLE_DATE=$(cylc cycle-point --offset-hours=6 --template=%Y%m%dT%H)
+        C4MEM=$(printf "%4.4d" {{imem}})
+
+    {% endfor %}
+
+
     #---------------------------------------------------------------------------
     # run obsop
     #
@@ -92,12 +115,12 @@
                  echo "run_obsop {{imem}} $CYCLE_DATE"
                  {{CYCLE_LETKF_SRCS}}/run_obsop.py {{SHARED_TMP_DIR}}/${CYCLE_DATE}_obsop${C4MEM} \
                  --obsopExec  {{OLETKF_EXEC_DIR}}/OCN.obsOp_mom6.sss.x \
-                 --rstFile    {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst${C4MEM}/scratch/RESTART/MOM.res.nc \
+                 --rstFile    {{EXP_DIR}}/bkgd/${C4MEM}/${NEXT_CYCLE_DATE}/RESTART/MOM.res.nc \
                  --staticFile {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst${C4MEM}/scratch/ocean_static.nc \
                  --topoFile   {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst${C4MEM}/scratch/INPUT/ocean_topog_Edited.nc \
                  --nml        {{CYCLE_LETKF_SRCS}}/cylc/cpld_odas/etc/input.nml.obsop.5deg \
                  --bkgdFile   {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst${C4MEM}/scratch/ocean_hourly_${NEXT_CYCLE_YYYY_MM_DD_HH}.nc \
-                 --obsFile    /discover/nobackup/cda/projects2/tmp/test_obsop_5deg/SMAP_L2B_SSS_36950_20220101T005200_R18240_V5.0.h5 \
+                 --obsFile    {{EXP_DIR}}/obs/${NEXT_CYCLE_DATE}/${NEXT_CYCLE_DATE}.sss.h5 \
                  --hxFile     {{EXP_DIR}}/obsbkgd/${C4MEM}/${NEXT_CYCLE_DATE}/hx_sss.dat \
                  --otherArgs '-olevel 2'
                  """
@@ -133,8 +156,8 @@
         script = """
                  echo "prep_letkf {{imem}} $CYCLE_DATE"
                  {{CYCLE_LETKF_SRCS}}/prep_letkf.py {{SHARED_TMP_DIR}}/${CYCLE_DATE}_letkf \
-                 --bkgdFile1 {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst${C4MEM}/scratch/RESTART/MOM.res.nc \
-                 --bkgdFile2 {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst${C4MEM}/scratch/RESTART/MOM.res.nc \
+                 --bkgdFile1 {{EXP_DIR}}/bkgd/${C4MEM}/${NEXT_CYCLE_DATE}/RESTART/MOM.res.nc \
+                 --bkgdFile2 {{EXP_DIR}}/bkgd/${C4MEM}/${NEXT_CYCLE_DATE}/RESTART/MOM.res.nc \
                  --obsFile   {{EXP_DIR}}/obsbkgd/${C4MEM}/${NEXT_CYCLE_DATE}/hx_sss.dat \ 
                  --member {{imem}}
 
@@ -159,7 +182,7 @@
                  --ensize       {{MEMBERS}} \
                  --letkfExec    {{OLETKF_EXEC_DIR}}/OCN.letkf_mom6.x \
                  --nprocs       {{NPROCS_LETKF}} \
-                 --rstFile      {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst0001/scratch/RESTART/MOM.res.nc \
+                 --rstFile      {{EXP_DIR}}/bkgd/0001/${NEXT_CYCLE_DATE}/RESTART/MOM.res.nc \
                  --staticFile   {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst0001/scratch/ocean_static.nc \
                  --topoFile     {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst0001/scratch/INPUT/ocean_topog_Edited.nc \
                  --nml          {{CYCLE_LETKF_SRCS}}/cylc/cpld_odas/etc/input.nml.letkf.5deg \
@@ -179,4 +202,43 @@
             --nodes = 1
             --constraint = cas
             --account = {{HPC_GROUP_ACCOUNT}}
- 
+
+    #---------------------------------------------------------------------------
+    # save letkf diag: save ensemble mean, sprd & ombmean
+    #
+    [[save_letkf_diag]]
+        script = """
+                 echo "save_letkf_diag ${C4MEM} $CYCLE_DATE"
+                 {{CYCLE_LETKF_SRCS}}/save_letkf_diag.py {{SHARED_TMP_DIR}}/${CYCLE_DATE}_letkf \
+                 --bkgdMeanDir {{EXP_DIR}}/bkgd/mean/${NEXT_CYCLE_DATE} \
+                 --bkgdSprdDir {{EXP_DIR}}/bkgd/sprd/${NEXT_CYCLE_DATE} \
+                 --analMeanDir {{EXP_DIR}}/anal/mean/${NEXT_CYCLE_DATE} \
+                 --analSprdDir {{EXP_DIR}}/anal/sprd/${NEXT_CYCLE_DATE} \
+                 --ombDir {{EXP_DIR}}/obsbkgd/mean/${NEXT_CYCLE_DATE}
+                 """
+        [[[environment]]]
+        CYCLE_DATE=$(cylc cycle-point --template=%Y%m%dT%H)
+        NEXT_CYCLE_DATE=$(cylc cycle-point --offset-hours=6 --template=%Y%m%dT%H)
+
+    #---------------------------------------------------------------------------
+    # save letkf mem
+    #
+    {% for imem in range(1,MEMBERS+1) %}
+    [[save_letkf_{{imem}}]]
+        script = """
+                 echo "save_letkf_mem ${C4MEM} $CYCLE_DATE"
+                 {{CYCLE_LETKF_SRCS}}/save_letkf_mem.py {{EXP_DIR}}/anal/${C4MEM}/${NEXT_CYCLE_DATE} \
+                 --letkfDir {{SHARED_TMP_DIR}}/${CYCLE_DATE}_letkf \
+                 --bkgdDir  {{EXP_DIR}}/bkgd/${C4MEM}/${NEXT_CYCLE_DATE}  \
+                 --res 5 \
+                 --member {{imem}}
+                 """
+        [[[environment]]]
+        CYCLE_DATE=$(cylc cycle-point --template=%Y%m%dT%H)
+        NEXT_CYCLE_DATE=$(cylc cycle-point --offset-hours=6 --template=%Y%m%dT%H)
+        C4MEM=$(printf "%4.4d" {{imem}})
+
+    {% endfor %}
+
+
+

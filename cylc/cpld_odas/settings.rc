@@ -13,7 +13,7 @@
 {% set MEMBERS = 3 %}
 {% set EXP_DIR="/discover/nobackup/cda/projects2/odas3" %}
 {% set INITIAL_CYCLE_POINT = "2017-01-01T00Z" %}
-{% set FINAL_CYCLE_POINT = "2017-01-01T00Z" %}
+{% set FINAL_CYCLE_POINT = "2017-01-01T06Z" %}
 {% set FCST_HRS = 6 %}
 
 {% set SHARED_TMP_DIR="/discover/nobackup/cda/projects2/tmp" %}
