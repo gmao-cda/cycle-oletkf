@@ -208,7 +208,7 @@
     #
     [[save_letkf_diag]]
         script = """
-                 echo "save_letkf_diag ${C4MEM} $CYCLE_DATE"
+                 echo "save_letkf_diag  $CYCLE_DATE"
                  {{CYCLE_LETKF_SRCS}}/save_letkf_diag.py {{SHARED_TMP_DIR}}/${CYCLE_DATE}_letkf \
                  --bkgdMeanDir {{EXP_DIR}}/bkgd/mean/${NEXT_CYCLE_DATE} \
                  --bkgdSprdDir {{EXP_DIR}}/bkgd/sprd/${NEXT_CYCLE_DATE} \
