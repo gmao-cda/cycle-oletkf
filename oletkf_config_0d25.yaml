@@ -1,0 +1,4 @@
+initial_ensemble_mapping:
+    member0001: "/discover/nobackup/projects/gmao/scda_iesa/shared/freeRun_GEOSgcm_after2016/restarts/restarts.e20180101_00z.tar"
+    member0002: "/discover/nobackup/projects/gmao/scda_iesa/shared/freeRun_GEOSgcm_after2016/restarts/restarts.e20180201_00z.tar"
+    member0003: "/discover/nobackup/projects/gmao/scda_iesa/shared/freeRun_GEOSgcm_after2016/restarts/restarts.e20180301_00z.tar"

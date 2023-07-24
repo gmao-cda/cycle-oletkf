@@ -1,0 +1,25 @@
+! Blank file in which we can put "overrides" for parameters
+
+LAYOUT = 30, 36
+#override DT = 450.0
+#override DT_THERM = 450.
+!BAD_VAL_SST_MIN = -3.0
+!BAD_VAL_SSS_MAX = 55.0
+HFREEZE = 2.0
+
+! disable checksums
+RESTART_CHECKSUMS_REQUIRED = False
+
+!VERBOSITY = 9
+!DEBUG = True
+!REPORT_UNUSED_PARAMS = True
+
+#override GUST_CONST = 1.e-31
+
+#override NUM_DIAG_COORDS = 1
+#override DIAG_COORDS = "z Z ZSTAR"
+#override DIAG_COORD_DEF_Z = "WOA09"
+
+#override TIDEAMP_FILE = "tidal_amplitude.v20140616.nc_newtopo_config.nc"
+#override GEOTHERMAL_FILE = "geothermal_davies2013_v1_newtopo_config.nc"
+#override CHL_FILE = "seawifs-clim-1997-2010.1440x1080.v20180328_newtopo_config.nc"
