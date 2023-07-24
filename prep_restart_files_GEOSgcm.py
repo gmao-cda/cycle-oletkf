@@ -29,7 +29,8 @@ def prepare_restart_directory(wkdir=None, restart_tar_file=None):
     os.unlink(os.path.join(wkdir,tar_file_name))
 
     # create cap_restart 
-    flist = glob.glob(os.path.join(wkdir,"*_rst*.nc4"))
+    #flist = glob.glob(os.path.join(wkdir,"*_rst*.nc4"))
+    flist = glob.glob(os.path.join(wkdir,"*_internal_rst*"))+glob.glob(os.path.join(wkdir,"*_import_rst*")) # for 0.25deg run, restart files can have no .nc4 suffix.
     restart_date_str = flist[0].split(".")[2]
     restart_date = dt.datetime.strptime(restart_date_str,"e%Y%m%d_%Hz") # e.g., e20160201_00z
     with open(os.path.join(wkdir,"cap_restart"),"w") as f:
