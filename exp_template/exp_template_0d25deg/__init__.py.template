@@ -1,14 +1,14 @@
 '''
-GEOS_CDA_EXPID@
+@GEOS_CDA_EXPID@
 
 ### Put detailed experiment description here ###
 '''
 import os
 from datetime import date
 
-expid='GEOS_CDA_EXPID@'
-cmpexp='GEOS_CDA_EXPID@'
-data_path='GEOS_CDA_EXPID@'
+expid='@GEOS_CDA_EXPID@'
+cmpexp='@GEOS_CDA_EXPID@'
+data_path='@GEOS_CDA_EXPID@'
 plot_path=data_path+'/plots_ocn'
 basin_mask='/discover/nobackup/projects/gmao/ssd/aogcm/basin_mask/1440x1080/basin_mask.nc'
 grid_spec='/discover/nobackup/projects/gmao/ssd/aogcm/a180x1080_o1440x1080/INPUT/grid_spec.nc'
