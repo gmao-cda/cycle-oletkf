@@ -59,8 +59,8 @@ def save_letkf_mem_output(analDir  = os.path.abspath("./"), \
        ocnBkgdDir = os.path.join(bkgdDir, "RESTART")
        srcs = [ os.path.join(letkfDir, "anal{:03d}.MOM.res.nc".format(member)), \
                 os.path.join(letkfDir, "anal{:03d}.MOM.res_1.nc".format(member)), \
-                os.path.join(ocnBkgdDir, "anal{:03d}.MOM.res_2.nc".format(member)), \
-                os.path.join(ocnBkgdDir, "anal{:03d}.MOM.res_3.nc".format(member)) ]
+                os.path.join(ocnBkgdDir, "MOM.res_2.nc".format(member)), \
+                os.path.join(ocnBkgdDir, "MOM.res_3.nc".format(member)) ]
        dsts = [ os.path.join(ocnAnalDir, "MOM.res.nc"), \
                 os.path.join(ocnAnalDir, "MOM.res_1.nc"), \
                 os.path.join(ocnAnalDir, "MOM.res_2.nc"), \

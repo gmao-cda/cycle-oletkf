@@ -47,11 +47,13 @@ def save_geos_output( srcDir = os.path.abspath("./source_dir"), \
     # move the non-MOM6 restart files
     ## get the file list of checkpoints
     srcPathList = glob.glob(os.path.join(srcDir,"*_checkpoint"))
+    srcPathList_hist = glob.glob(os.path.join(srcDir,"geosgcm_*_checkpoint")) #
+    srcPathList = [s for s in srcPathList if s not in srcPathList_hist]
     print(srcPathList)
     if len(flistArchived) != len(srcPathList):
         print("num of *_checkpoint file = ".format(len(srcPathList)))
         print("num of predefined _rst file = ".format(len(flistArchived)))
-        raise RuntimeError("num of *_checkpoint file ({}) not the same as the predefined number")
+        raise RuntimeError("num of *_checkpoint file ({len(srcPathList)}) not the same as the predefined number ({len(flistArchived)})")
         sys.exit(2)
 
     for srcPath in srcPathList:

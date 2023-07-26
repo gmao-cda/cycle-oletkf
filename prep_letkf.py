@@ -51,12 +51,12 @@ def prep_letkf_1mem(wkdir = "./", \
     os.symlink(obsFile,   os.path.join(wkdir, daObsFile))
     os.symlink(bkgdFile1, os.path.join(wkdir, daBkgdFile1))
     if bkgdFile2 != bkgdFile1: 
-        os.symlink(bgkdFile2, os.path.join(wkdir, daBkgdFile2))
+        os.symlink(bkgdFile2, os.path.join(wkdir, daBkgdFile2))
 
     # copy files
     shutil.copy2(bkgdFile1, os.path.join(wkdir, daAnalFile1))
     if bkgdFile2 != bkgdFile1:
-        shutil.copy2(bgkdFile2, os.path.join(wkdir, daAnalFile2))
+        shutil.copy2(bkgdFile2, os.path.join(wkdir, daAnalFile2))
 
 
 
