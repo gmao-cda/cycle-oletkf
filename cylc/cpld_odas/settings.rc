@@ -11,15 +11,15 @@
 
 
 {% set NJOBS_FOR_PREP_GEOS = 5 %}
-{% set NJOBS_FOR_FCST_GEOS = 2 %}
+{% set NJOBS_FOR_FCST_GEOS = 5 %}
 {% set NJOBS_FOR_SAVE_GEOS = 5 %}
 {% set NJOBS_FOR_OBSOP = 5 %}
 {% set NJOBS_FOR_PREP_LETKF = 5 %}
 {% set NJOBS_FOR_SAVE_LETKF = 5 %}
 
 {% set MEMBERS = 3 %}
-{% set EXP_DIR="/discover/nobackup/cda/projects2/odas3_queue" %}
-{% set SHARED_TMP_DIR="/discover/nobackup/cda/projects2/tmp_queue" %}
+{% set EXP_DIR="/discover/nobackup/cda/projects2/odas3_queue2" %}
+{% set SHARED_TMP_DIR="/discover/nobackup/cda/projects2/tmp_queue2" %}
 {% set INITIAL_CYCLE_POINT = "2017-01-01T00Z" %}
 {% set FINAL_CYCLE_POINT = "2017-01-01T06Z" %}
 

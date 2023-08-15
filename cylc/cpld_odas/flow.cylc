@@ -44,6 +44,19 @@
           members = GROUP_SAVE_LETKF
 
 [runtime]
+
+    #---------------------------------------------------------------------------
+    # env shared by all tasks
+    #
+    [[root]]
+        [[[environment]]]
+            CYCLE_DATE=$(cylc cycle-point --template=%Y%m%dT%H)
+            NEXT_CYCLE_DATE=$(cylc cycle-point --offset-hours=6 --template=%Y%m%dT%H)
+            NEXT_CYCLE_YYYY_MM_DD_HH=$(cylc cycle-point --offset-hours=6 --template=%Y_%m_%d_%H)
+
+    #---------------------------------------------------------------------------
+    # task group for tasks with a ensemble dimension
+    #
     [[GROUP_PREP_GEOS]]
     [[GROUP_FCST_GEOS]]
     [[GROUP_SAVE_GEOS]]
@@ -68,8 +81,7 @@
                  """
         inherit = GROUP_PREP_GEOS
         [[[environment]]]
-        CYCLE_DATE=$(cylc cycle-point --template=%Y%m%dT%H)
-        C4MEM=$(printf "%4.4d" {{imem}})
+            C4MEM=$(printf "%4.4d" {{imem}})
 
     {% endfor %}
 
@@ -101,9 +113,7 @@
                  """
         inherit = GROUP_FCST_GEOS
         [[[environment]]]
-        CYCLE_DATE=$(cylc cycle-point --template=%Y%m%dT%H)
-        NEXT_CYCLE_DATE=$(cylc cycle-point --offset-hours=6 --template=%Y%m%dT%H)
-        C4MEM=$(printf "%4.4d" {{imem}})
+            C4MEM=$(printf "%4.4d" {{imem}})
 
         [[[directives]]]
             --nodes = 1
@@ -125,9 +135,7 @@
                  """
         inherit = GROUP_SAVE_GEOS
         [[[environment]]]
-        CYCLE_DATE=$(cylc cycle-point --template=%Y%m%dT%H)
-        NEXT_CYCLE_DATE=$(cylc cycle-point --offset-hours=6 --template=%Y%m%dT%H)
-        C4MEM=$(printf "%4.4d" {{imem}})
+            C4MEM=$(printf "%4.4d" {{imem}})
 
     {% endfor %}
 
@@ -141,6 +149,10 @@
         execution time limit = PT10M
         script = """
                  echo "run_obsop {{imem}} $CYCLE_DATE"
+
+                 umask 022
+                 ulimit -s unlimited
+
                  {{CYCLE_LETKF_SRCS}}/run_obsop.py {{SHARED_TMP_DIR}}/${CYCLE_DATE}_obsop${C4MEM} \
                  --obsopExec  {{OLETKF_EXEC_DIR}}/OCN.obsOp_mom6.sss.x \
                  --rstFile    {{EXP_DIR}}/bkgd/${C4MEM}/${NEXT_CYCLE_DATE}/RESTART/MOM.res.nc \
@@ -154,13 +166,11 @@
                  """
         inherit = GROUP_OBSOP
         [[[environment]]]
-        CYCLE_DATE=$(cylc cycle-point --template=%Y%m%dT%H)
-        NEXT_CYCLE_DATE=$(cylc cycle-point --offset-hours=6 --template=%Y%m%dT%H)
-        NEXT_CYCLE_YYYY_MM_DD_HH=$(cylc cycle-point --offset-hours=6 --template=%Y_%m_%d_%H)
-        C4MEM=$(printf "%4.4d" {{imem}})
+            C4MEM=$(printf "%4.4d" {{imem}})
 
         [[[directives]]]
             --nodes = 1
+            --constraint = "[cas|sky]"
             --account = {{HPC_GROUP_ACCOUNT}}
  
     {% endfor %}
@@ -174,7 +184,6 @@
                  {{CYCLE_LETKF_SRCS}}/create_letkf_dir.py {{SHARED_TMP_DIR}}/${CYCLE_DATE}_letkf
                  """
         [[[environment]]]
-        CYCLE_DATE=$(cylc cycle-point --template=%Y%m%dT%H)
 
 
     #---------------------------------------------------------------------------
@@ -193,9 +202,7 @@
                  """
         inherit = GROUP_PREP_LETKF
         [[[environment]]]
-        CYCLE_DATE=$(cylc cycle-point --template=%Y%m%dT%H)
-        NEXT_CYCLE_DATE=$(cylc cycle-point --offset-hours=6 --template=%Y%m%dT%H)
-        C4MEM=$(printf "%4.4d" {{imem}})
+            C4MEM=$(printf "%4.4d" {{imem}})
 
  
     {% endfor %}
@@ -207,6 +214,10 @@
         platform = discover
         execution time limit = PT10M
         script = """
+
+                 umask 022
+                 ulimit -s unlimited
+
                  echo "run_letkf $CYCLE_DATE"
                  PYTHONPATH={{CYCLE_LETKF_SRCS}} {{CYCLE_LETKF_SRCS}}/run_letkf.py {{SHARED_TMP_DIR}}/${CYCLE_DATE}_letkf \
                  --ensize       {{MEMBERS}} \
@@ -225,12 +236,10 @@
                  """
 
         [[[environment]]]
-        CYCLE_DATE=$(cylc cycle-point --template=%Y%m%dT%H)
-        NEXT_CYCLE_DATE=$(cylc cycle-point --offset-hours=6 --template=%Y%m%dT%H)
 
         [[[directives]]]
             --nodes = 1
-            --constraint = cas
+            --constraint = "[cas|sky]"
             --account = {{HPC_GROUP_ACCOUNT}}
 
     #---------------------------------------------------------------------------
@@ -247,8 +256,6 @@
                  --ombDir {{EXP_DIR}}/obsbkgd/mean/${NEXT_CYCLE_DATE}
                  """
         [[[environment]]]
-        CYCLE_DATE=$(cylc cycle-point --template=%Y%m%dT%H)
-        NEXT_CYCLE_DATE=$(cylc cycle-point --offset-hours=6 --template=%Y%m%dT%H)
 
     #---------------------------------------------------------------------------
     # save letkf mem
@@ -265,9 +272,7 @@
                  """
         inherit = GROUP_SAVE_LETKF
         [[[environment]]]
-        CYCLE_DATE=$(cylc cycle-point --template=%Y%m%dT%H)
-        NEXT_CYCLE_DATE=$(cylc cycle-point --offset-hours=6 --template=%Y%m%dT%H)
-        C4MEM=$(printf "%4.4d" {{imem}})
+            C4MEM=$(printf "%4.4d" {{imem}})
 
     {% endfor %}
 
