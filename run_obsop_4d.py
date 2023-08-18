@@ -12,19 +12,19 @@ def run_shell_cmd(cmd, wkdir):
     return p.returncode, out.decode(), err.decode()
 
 
-def run_single_obsop(wkdir      = os.path.abspath("./"), \
-                     obsopExec  = os.path.abspath("./OCN.obsOp_mom6.sss.x"), \
-                     rstFile    = os.path.abspath("./MOM.res.nc"), \
-                     staticFile = os.path.abspath("./ocean_static.nc"), \
-                     topoFile   = os.path.abspath("./ocean_topo.nc"), \
-                     nml        = os.path.abspath("./input.nml"),\
-                     bkgdFile   = os.path.abspath("./ocean_hourly_%Y_%m_%d_%H.nc"),\
-                     obsFile    = os.path.abspath("./%Y%m%dT%H.sss.h5"),\
-                     hxFile     = os.path.abspath("./obsout.dat"), \
-                     startDate  = dt.datetime(2019,1,1,6,0,0), \
-                     endDate    = dt.datetime(2019,1,1,12,0,0), \
-                     rinc       = 6, \
-                     otherArgs  = None):
+def run_single_obsop(wkdir       = os.path.abspath("./"), \
+                     obsopExec   = os.path.abspath("./OCN.obsOp_mom6.sss.x"), \
+                     rstFile     = os.path.abspath("./MOM.res.nc"), \
+                     staticFile  = os.path.abspath("./ocean_static.nc"), \
+                     topoFile    = os.path.abspath("./ocean_topo.nc"), \
+                     nml         = os.path.abspath("./input.nml"),\
+                     bkgdFileTpl = os.path.abspath("./ocean_hourly_%Y_%m_%d_%H.nc"),\
+                     obsFileTpl  = os.path.abspath("./%Y%m%dT%H.sss.h5"),\
+                     hxFile      = os.path.abspath("./obsout.dat"), \
+                     startDate   = dt.datetime(2019,1,1,6,0,0), \
+                     endDate     = dt.datetime(2019,1,1,12,0,0), \
+                     rinc        = 6, \
+                     otherArgs   = None):
 
     print("START: run_single_obsop")
     if not os.path.isfile(obsopExec):
@@ -49,8 +49,8 @@ def run_single_obsop(wkdir      = os.path.abspath("./"), \
 
     cdate=startDate
     while cdate <= endDate:
-        cdateBkgdFile = cdate.strftime(bkgdFile)
-        cdateObsFile  = cdate.strftime(obsFile)
+        cdateBkgdFile = cdate.strftime(bkgdFileTpl)
+        cdateObsFile  = cdate.strftime(obsFileTpl)
 
         if not os.path.isfile(cdateBkgdFile):
             raise RuntimeError("nml ({}) does not exist.".format(cdateBkgdFile) )
@@ -82,8 +82,8 @@ def run_single_obsop(wkdir      = os.path.abspath("./"), \
     # generate hx for each time slot
     cdate=startDate
     while cdate <= endDate:
-        cdateBkgdFile = cdate.strftime(bkgdFile)
-        cdateObsFile  = cdate.strftime(obsFile)
+        cdateBkgdFile = cdate.strftime(bkgdFileTpl)
+        cdateObsFile  = cdate.strftime(obsFileTpl)
         cdateHxFile = os.path.basename(hxFile) + cdate.strftime(".%Y%m%dT%H")
 
         #print("ln1: {} -> {}".format(cdateBkgdFile,   os.path.join(wkdir,os.path.basename(cdateBkgdFile))))
@@ -154,8 +154,8 @@ def parse_cmd_line():
     parser.add_argument("--staticFile",required=True, type=str,default=None, help=(""))
     parser.add_argument("--topoFile",  required=True, type=str,default=None, help=(""))
     parser.add_argument("--nml",       required=True, type=str,default=None, help=(""))
-    parser.add_argument("--bkgdFile",  required=True, type=str,help=(""))
-    parser.add_argument("--obsFile",   required=True, type=str,help=())
+    parser.add_argument("--bkgdFileTpl",  required=True, type=str,help=(""))
+    parser.add_argument("--obsFileTpl",   required=True, type=str,help=())
     parser.add_argument("--hxFile",    required=True, type=str,help=()) # out
     parser.add_argument("--startDate", required=True, type=str,default="201001010T06",metavar="YYYYMMDDHH", help=())
     parser.add_argument("--endDate",   required=False,type=str,default=None, metavar="YYYYMMDDHH", help=())
@@ -172,8 +172,8 @@ def parse_cmd_line():
     args.staticFile = os.path.abspath(args.staticFile)
     args.topoFile = os.path.abspath(args.topoFile)
     args.nml = os.path.abspath(args.nml)
-    args.bkgdFile = os.path.abspath(args.bkgdFile)
-    args.obsFile = os.path.abspath(args.obsFile)
+    args.bkgdFileTpl = os.path.abspath(args.bkgdFileTpl)
+    args.obsFileTpl = os.path.abspath(args.obsFileTpl)
     args.hxFile = os.path.abspath(args.hxFile)
 
 
@@ -196,8 +196,8 @@ if __name__ == '__main__':
                       args.staticFile, \
                       args.topoFile, \
                       args.nml, \
-                      args.bkgdFile, \
-                      args.obsFile, \
+                      args.bkgdFileTpl, \
+                      args.obsFileTpl, \
                       args.hxFile, \
                       args.startDate, \
                       args.endDate, \

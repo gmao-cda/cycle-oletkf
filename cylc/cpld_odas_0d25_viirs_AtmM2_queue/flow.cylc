@@ -43,6 +43,21 @@
           members = GROUP_SAVE_LETKF
 
 [runtime]
+    #---------------------------------------------------------------------------
+    # env shared by all tasks
+    #
+    [[root]]
+        [[[environment]]]
+            CYCLE_DATE=$(cylc cycle-point --template=%Y%m%dT%H)
+            CYCLE_F1H_DATE=$(cylc cycle-point --offset-hours=1 --template=%Y%m%dT%H)
+            CYCLE_F6H_DATE=$(cylc cycle-point --offset-hours=6 --template=%Y%m%dT%H)
+
+            NEXT_CYCLE_DATE=$(cylc cycle-point --offset-hours=6 --template=%Y%m%dT%H)
+            NEXT_CYCLE_YYYY_MM_DD_HH=$(cylc cycle-point --offset-hours=6 --template=%Y_%m_%d_%H)
+
+    #---------------------------------------------------------------------------
+    # task group for tasks with an ensemble dimension
+    #
     [[GROUP_PREP_GEOS]]
     [[GROUP_FCST_GEOS]]
     [[GROUP_SAVE_GEOS]]
@@ -67,8 +82,7 @@
                  """
         inherit = GROUP_PREP_GEOS
         [[[environment]]]
-        CYCLE_DATE=$(cylc cycle-point --template=%Y%m%dT%H)
-        C4MEM=$(printf "%4.4d" {{imem}})
+            C4MEM=$(printf "%4.4d" {{imem}})
 
     {% endfor %}
 
@@ -100,9 +114,7 @@
                  """
         inherit = GROUP_FCST_GEOS
         [[[environment]]]
-        CYCLE_DATE=$(cylc cycle-point --template=%Y%m%dT%H)
-        NEXT_CYCLE_DATE=$(cylc cycle-point --offset-hours=6 --template=%Y%m%dT%H)
-        C4MEM=$(printf "%4.4d" {{imem}})
+            C4MEM=$(printf "%4.4d" {{imem}})
 
         [[[directives]]]
             --nodes = 27
@@ -124,9 +136,7 @@
                  """
         inherit = GROUP_SAVE_GEOS
         [[[environment]]]
-        CYCLE_DATE=$(cylc cycle-point --template=%Y%m%dT%H)
-        NEXT_CYCLE_DATE=$(cylc cycle-point --offset-hours=6 --template=%Y%m%dT%H)
-        C4MEM=$(printf "%4.4d" {{imem}})
+            C4MEM=$(printf "%4.4d" {{imem}})
 
     {% endfor %}
 
@@ -153,10 +163,7 @@
                  """
         inherit = GROUP_OBSOP
         [[[environment]]]
-        CYCLE_DATE=$(cylc cycle-point --template=%Y%m%dT%H)
-        NEXT_CYCLE_DATE=$(cylc cycle-point --offset-hours=6 --template=%Y%m%dT%H)
-        NEXT_CYCLE_YYYY_MM_DD_HH=$(cylc cycle-point --offset-hours=6 --template=%Y_%m_%d_%H)
-        C4MEM=$(printf "%4.4d" {{imem}})
+            C4MEM=$(printf "%4.4d" {{imem}})
 
         [[[directives]]]
             --nodes = 1
@@ -174,7 +181,6 @@
                  {{CYCLE_LETKF_SRCS}}/create_letkf_dir.py {{SHARED_TMP_DIR}}/${CYCLE_DATE}_letkf
                  """
         [[[environment]]]
-        CYCLE_DATE=$(cylc cycle-point --template=%Y%m%dT%H)
 
 
     #---------------------------------------------------------------------------
@@ -225,8 +231,6 @@
                  """
 
         [[[environment]]]
-        CYCLE_DATE=$(cylc cycle-point --template=%Y%m%dT%H)
-        NEXT_CYCLE_DATE=$(cylc cycle-point --offset-hours=6 --template=%Y%m%dT%H)
 
         [[[directives]]]
             --nodes = 20
@@ -247,8 +251,6 @@
                  --ombDir {{EXP_DIR}}/obsbkgd/mean/${NEXT_CYCLE_DATE}
                  """
         [[[environment]]]
-        CYCLE_DATE=$(cylc cycle-point --template=%Y%m%dT%H)
-        NEXT_CYCLE_DATE=$(cylc cycle-point --offset-hours=6 --template=%Y%m%dT%H)
 
     #---------------------------------------------------------------------------
     # save letkf mem
@@ -265,9 +267,7 @@
                  """
         inherit = GROUP_SAVE_LETKF
         [[[environment]]]
-        CYCLE_DATE=$(cylc cycle-point --template=%Y%m%dT%H)
-        NEXT_CYCLE_DATE=$(cylc cycle-point --offset-hours=6 --template=%Y%m%dT%H)
-        C4MEM=$(printf "%4.4d" {{imem}})
+            C4MEM=$(printf "%4.4d" {{imem}})
 
     {% endfor %}
 

@@ -8,6 +8,7 @@
 {% set NPROCS_LETKF = 10 %}
 
 {% set HPC_GROUP_ACCOUNT = "s2647" %}
+{% set HPC_QOS = "allnccs" %}
 
 
 {% set NJOBS_FOR_PREP_GEOS = 5 %}

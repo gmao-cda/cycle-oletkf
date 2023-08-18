@@ -9,7 +9,8 @@ CONTACT: 'http://gmao.gsfc.nasa.gov'
 COLLECTIONS: 'geosgcm_prog'
              'geosgcm_surf_cda'
              'geosgcm_pcp_cda'
-#             'prog.eta'
+             'prog.eta'
+             'prog.eta_cube'
 #             'geosgcm_surf'
 #             'geosgcm_ocn'
 #             'geosgcm_moist'
@@ -120,6 +121,39 @@ PC48x25-DC.LM: 72
                                  'QRTOT'      , 'MOIST'      , 'qrtot'      ,
                                  'QSTOT'      , 'MOIST'      , 'qstot'      ,
                                   ::
+
+  prog.eta_cube.template:             '%y4%m2%d2_%h2%n2z.nc4' ,
+  prog.eta_cube.archive:              '%c/Y%y4' ,
+  prog.eta_cube.format:               'CFIO' ,
+  prog.eta_cube.deflate:               1 ,
+#  prog.eta_cube.grid_label:            PC48x25-DC ,
+  prog.eta_cube.regrid_method:        'BILINEAR',
+  prog.eta_cube.mode:                 'instantaneous' ,
+  prog.eta_cube.frequency:             060000 ,
+  prog.eta_cube.duration:              060000 ,
+  prog.eta_cube.ref_time:              000000 ,
+  prog.eta_cube.fields:               'PHIS'       , 'AGCM'       , 'phis'       ,
+                                 'SGH'        , 'AGCM'       , 'hs_stdv'    ,
+                                 'TS'         , 'SURFACE'    , 'ts'         ,
+                                 'FRLAND'     , 'SURFACE'    , 'frland'     ,
+                                 'FRLANDICE'  , 'SURFACE'    , 'frlandice'  ,
+                                 'FRLAKE'     , 'SURFACE'    , 'frlake'     ,
+                                 'FROCEAN'    , 'SURFACE'    , 'frocean'    ,
+                                 'FRACI'      , 'SURFACE'    , 'frseaice'   ,
+                                 'PS'         , 'DYN'        , 'ps'         ,
+                                 'DELP'       , 'DYN'        , 'delp'       ,
+                                 'U_DGRID'        , 'DYN'        , 'u_dgrid'        ,
+                                 'V_DGRID'        , 'DYN'        , 'v_dgrid'        ,
+                                 'TV'         , 'DYN'        , 'tv'         ,
+                                 'Q'          , 'MOIST'      , 'sphu'       ,
+                                 'O3PPMV'     , 'CHEMISTRY'  , 'ozone'      ,
+                                 'QITOT'      , 'AGCM'       , 'qitot'      ,
+                                 'QLTOT'      , 'AGCM'       , 'qltot'      ,
+                                 'QRTOT'      , 'MOIST'      , 'qrtot'      ,
+                                 'QSTOT'      , 'MOIST'      , 'qstot'      ,
+                                  ::
+
+
 
   geosgcm_surf_cda.template:         '%y4%m2%d2_%h2%n2z.nc4' ,
   geosgcm_surf_cda.archive:          '%c/Y%y4' ,

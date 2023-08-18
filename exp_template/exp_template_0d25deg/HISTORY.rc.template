@@ -7,7 +7,9 @@ EXPSRC: GEOSgcm-v10.23.0
 CONTACT: 'http://gmao.gsfc.nasa.gov'
 
 COLLECTIONS: 'geosgcm_prog'
-#             'prog.eta'
+             'prog.eta'
+             'geosgcm_surf_cda'
+             'geosgcm_pcp_cda'
              'geosgcm_surf'
              'geosgcm_ocn'
 #             'geosgcm_moist'
@@ -118,6 +120,43 @@ PC720x361-DC.LM: 72
                                  'QRTOT'      , 'MOIST'      , 'qrtot'      ,
                                  'QSTOT'      , 'MOIST'      , 'qstot'      ,
                                   ::
+
+  geosgcm_surf_cda.template:         '%y4%m2%d2_%h2%n2z.nc4' ,
+  geosgcm_surf_cda.archive:          '%c/Y%y4' ,
+  geosgcm_surf_cda.format:           'CFIO' ,
+  geosgcm_surf_cda.deflate:           1 ,
+  geosgcm_surf_cda.grid_label:        PC720x361-DC ,
+  geosgcm_surf_cda.regrid_method:    'BILINEAR',
+  geosgcm_surf_cda.mode:             'instantaneous' ,
+#  geosgcm_surf_cda.monthly:           1 ,
+  geosgcm_surf_cda.frequency:         010000 ,
+# geosgcm_surf_cda.ref_time:          210000 ,
+  geosgcm_surf_cda.fields:       'T2M'            , 'SURFACE'     ,
+                                 'Q2M'            , 'SURFACE'     ,
+                                 'U10N;V10N'      , 'SURFACE'     ,
+                                 'U10M;V10M'      , 'SURFACE'     ,
+                                 'T10M'           , 'SURFACE'     ,
+                                 'Q10M'           , 'SURFACE'     ,
+                                  ::
+
+  geosgcm_pcp_cda.template:         '%y4%m2%d2_%h2%n2z.nc4' ,
+  geosgcm_pcp_cda.archive:          '%c/Y%y4' ,
+  geosgcm_pcp_cda.format:           'CFIO' ,
+  geosgcm_pcp_cda.deflate:           1 ,
+  geosgcm_pcp_cda.grid_label:        PC720x361-DC ,
+  geosgcm_pcp_cda.regrid_method:    'BILINEAR',
+  geosgcm_pcp_cda.mode:             'time-averaged' ,
+  geosgcm_pcp_cda.frequency:         010000 ,
+  geosgcm_pcp_cda.duration:          010000 ,
+  geosgcm_pcp_cda.fields:       'CN_PRCP'        , 'MOIST'       , 'CNPRCP'     ,
+                                 'LS_PRCP'        , 'MOIST'       , 'LSPRCP'     ,
+                                 'AN_PRCP'        , 'MOIST'       , 'ANPRCP'     ,
+                                 'LS_PRCP+CU2DRAINMOVE+CU2DSNOWMOVE'   , 'MOIST'       , 'LSORIG'     ,
+                                 'CN_PRCP-CU2DRAINMOVE-CU2DSNOWMOVE'   , 'MOIST'       , 'CNORIG'     ,
+                                 'SNOWOCN'        , 'SURFACE'     , 
+                                 'RAINOCN'        , 'SURFACE'     ,
+                                  ::
+
 
   geosgcm_surf.template:         '%y4%m2%d2_%h2%n2z.nc4' ,
   geosgcm_surf.archive:          '%c/Y%y4' ,
