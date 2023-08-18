@@ -1,2 +1,0 @@
-{% set MEMBERS = 10 %}
-{% set LIB_SRCS = "/discover/nobackup/cda/develop_space/cycle-oletkf/cylc/enfcst_jinja2/bin" %}
