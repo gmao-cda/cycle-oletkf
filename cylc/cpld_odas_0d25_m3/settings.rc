@@ -8,6 +8,7 @@
 {% set NPROCS_LETKF = 840 %}
 
 {% set HPC_GROUP_ACCOUNT = "s2647" %}
+{% set HPC_QOS = "allnccs" %}
 
 {% set NJOBS_FOR_PREP_GEOS = 10 %}
 {% set NJOBS_FOR_FCST_GEOS = 20 %}
@@ -18,8 +19,8 @@
 
 
 {% set MEMBERS = 3 %}
-{% set EXP_DIR= "/discover/nobackup/cda/projects2/odas3_0d25_viirs_AtmM2_m20" %}
-{% set SHARED_TMP_DIR= "/discover/nobackup/cda/projects2/tmp_0d25_m20" %}
+{% set EXP_DIR= "/discover/nobackup/cda/projects2/odas3_0d25_4d_m3" %}
+{% set SHARED_TMP_DIR= "/discover/nobackup/cda/projects2/tmp_odas3_0d25_4d_m3" %}
 {% set INITIAL_CYCLE_POINT = "2019-09-01T00Z" %}
 {% set FINAL_CYCLE_POINT = "2019-09-01T00Z" %}
 

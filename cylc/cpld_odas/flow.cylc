@@ -163,8 +163,8 @@
                  --staticFile {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst${C4MEM}/scratch/ocean_static.nc \
                  --topoFile   {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst${C4MEM}/scratch/INPUT/ocean_topog_Edited.nc \
                  --nml        {{CYCLE_LETKF_SRCS}}/cylc/cpld_odas/etc/input.nml.obsop.5deg \
-                 --bkgdFile   {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst${C4MEM}/scratch/ocean_hourly_%Y_%m_%d_%H.nc \
-                 --obsFile    {{EXP_DIR}}/obs/${NEXT_CYCLE_DATE}/%Y%m%dT%H.sss.h5 \
+                 --bkgdFileTpl   {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst${C4MEM}/scratch/ocean_hourly_%Y_%m_%d_%H.nc \
+                 --obsFileTpl    {{EXP_DIR}}/obs/${NEXT_CYCLE_DATE}/%Y%m%dT%H.sss.h5 \
                  --hxFile     {{EXP_DIR}}/obsbkgd/${C4MEM}/${NEXT_CYCLE_DATE}/hx_sss.dat \
                  --startDate  ${CYCLE_F1H_DATE} \
                  --endDate    ${CYCLE_F6H_DATE} \

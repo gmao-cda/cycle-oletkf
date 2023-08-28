@@ -121,6 +121,7 @@
             --ntasks-per-node = 45
             --constraint = cas
             --account = {{HPC_GROUP_ACCOUNT}}
+            --qos = {{HPC_QOS}}
 
     {% endfor %}
      
@@ -147,18 +148,21 @@
     {% for imem in range(1,MEMBERS+1) %}
     [[run_obsop_{{imem}}]]
         platform = discover
-        execution time limit = PT15M
+        execution time limit = PT20M
         script = """
-                 echo "run_obsop {{imem}} $CYCLE_DATE"
-                 {{CYCLE_LETKF_SRCS}}/run_obsop.py {{SHARED_TMP_DIR}}/${CYCLE_DATE}_obsop${C4MEM} \
+                 echo "run_obsop_4d {{imem}} $CYCLE_DATE"
+                 {{CYCLE_LETKF_SRCS}}/run_obsop_4d.py {{SHARED_TMP_DIR}}/${CYCLE_DATE}_obsop${C4MEM} \
                  --obsopExec  {{OLETKF_EXEC_DIR}}/OCN.obsOp_mom6.sst_viirs.x \
                  --rstFile    {{EXP_DIR}}/bkgd/${C4MEM}/${NEXT_CYCLE_DATE}/RESTART/MOM.res.nc \
                  --staticFile {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst${C4MEM}/scratch/ocean_static.nc \
                  --topoFile   {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst${C4MEM}/scratch/INPUT/ocean_topog.nc \
                  --nml        {{CYCLE_LETKF_SRCS}}/cylc/cpld_odas_0d25/etc/input.nml.obsop.0d25deg \
-                 --bkgdFile   {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst${C4MEM}/scratch/ocean_hourly_${NEXT_CYCLE_YYYY_MM_DD_HH}.nc \
-                 --obsFile    {{EXP_DIR}}/obs/${NEXT_CYCLE_DATE}/${NEXT_CYCLE_DATE}.sst.bin \
+                 --bkgdFileTpl   {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst${C4MEM}/scratch/ocean_hourly_%Y_%m_%d_%H.nc \
+                 --obsFileTpl    {{EXP_DIR}}/obs/${NEXT_CYCLE_DATE}/%Y%m%dT%H.sst.bin \
                  --hxFile     {{EXP_DIR}}/obsbkgd/${C4MEM}/${NEXT_CYCLE_DATE}/hx_sst.dat \
+                 --startDate ${CYCLE_F1H_DATE} \
+                 --endDate   ${CYCLE_F6H_DATE} \
+                 --rinc      1 \
                  --otherArgs '-binary T'
                  """
         inherit = GROUP_OBSOP
@@ -169,6 +173,7 @@
             --nodes = 1
             --constraint = "[cas|sky]"
             --account = {{HPC_GROUP_ACCOUNT}}
+            --qos = {{HPC_QOS}}
  
     {% endfor %}
 
@@ -236,6 +241,7 @@
             --nodes = 20
             --constraint = cas
             --account = {{HPC_GROUP_ACCOUNT}}
+            --qos = {{HPC_QOS}}
 
     #---------------------------------------------------------------------------
     # save letkf diag: save ensemble mean, sprd & ombmean
