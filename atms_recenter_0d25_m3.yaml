@@ -1,0 +1,4 @@
+initial_ensemble_mapping:
+    member0001: "/discover/nobackup/projects/gmao/scda_iesa/sakella/experiments/atmM2_relaxSST_relaxSSS/restarts/restarts.e20190901_21z.tar"
+    member0002: "/discover/nobackup/projects/gmao/scda_iesa/sakella/experiments/atmM2_relaxSST_relaxSSS/restarts/restarts.e20190902_21z.tar"
+    member0003: "/discover/nobackup/projects/gmao/scda_iesa/sakella/experiments/atmM2_relaxSST_relaxSSS/restarts/restarts.e20190903_21z.tar"

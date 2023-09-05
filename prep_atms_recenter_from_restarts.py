@@ -70,7 +70,7 @@ def create_center_dir(wkdir    = os.path.abspath("./"), \
                  fRenamed  = f"{f}_renamed_{timeStamp}"
                  subDirRenamed = f"files_renamed_{timeStamp}"
                  os.makedirs(os.path.join(subDirTo,subDirRenamed),exist_ok=True)
-                 os.rename(os.path.join(subDirTo,f), os.path.join(subDirTo,subDirRenamed,fRenamed))
+                 shutil.move(os.path.join(subDirTo,f), os.path.join(subDirTo,subDirRenamed,fRenamed))
           else:
             os.makedirs(subDirTo, exist_ok=True)
             
@@ -91,7 +91,7 @@ def create_center_dir(wkdir    = os.path.abspath("./"), \
 
              fFullName = os.path.basename(flist[0])
              print(os.path.join(subDirTo, fFullName), "--->", os.path.join(subDirTo, f))
-             os.rename(os.path.join(subDirTo, fFullName), os.path.join(subDirTo, f))
+             shutil.move(os.path.join(subDirTo, fFullName), os.path.join(subDirTo, f))
 
 
 def parse_cmd_line():
