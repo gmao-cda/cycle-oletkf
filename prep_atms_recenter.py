@@ -49,7 +49,7 @@ def prep_recenter_1mem(wkdir  = os.path.abspath("./"), \
             os.makedirs(os.path.join(wkdir,subDirRenamed),exist_ok=True)
             shutil.move(os.path.join(wkdir,fDst), os.path.join(wkdir,subDirRenamed,fRenamed))
         
-        print("ln -sf", os.path.join(memDir,fSrc), "---->", os.path.join(wkdir,fDst))
+        print("ln -sf:", os.path.join(memDir,fSrc), "---->", os.path.join(wkdir,fDst))
         os.symlink(os.path.join(memDir,fSrc), os.path.join(wkdir,fDst))
 
     # copy anal file template to wkdir

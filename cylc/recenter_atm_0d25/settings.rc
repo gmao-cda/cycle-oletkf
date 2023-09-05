@@ -4,20 +4,21 @@
 {% set FWD_EXEC = "/discover/nobackup/projects/gmao/scda_iesa/cda/GEOSgcm_08Nov2022/install/bin/GEOSgcm.x" %}
 {% set SITE = "NCCS" %}
 
-{% set OLETKF_EXEC_DIR = "/discover/nobackup/cda/projects2/viirs_sst/Ocean-LETKF/cbuild/src" %}
+{% set RECENTER_EXEC_DIR = "/discover/nobackup/cda/develop_space/GEOSFV3-LETKF/build_discover/utils" %}
 {% set NPROCS_RECENTER = 3 %}
 
 {% set HPC_GROUP_ACCOUNT = "s2647" %}
 {% set HPC_QOS = "allnccs" %}
 
-{% set NJOBS_FOR_PREP_GEOS = 10 %}
-{% set NJOBS_FOR_FCST_GEOS = 20 %}
-{% set NJOBS_FOR_SAVE_GEOS = 20 %}
-{% set NJOBS_FOR_PREP_RECENTER = 10 %}
-{% set NJOBS_FOR_SAVE_RECENTER = 10 %}
+{% set NJOBS_FOR_PREP_GEOS = 5 %}
+{% set NJOBS_FOR_FCST_GEOS = 4 %}
+{% set NJOBS_FOR_SAVE_GEOS = 5 %}
+{% set NJOBS_FOR_PREP_RECENTER = 5 %}
+{% set NJOBS_FOR_SAVE_RECENTER = 5 %}
 
 
 {% set MEMBERS = 3 %}
+{% set CENTER_DIR = "/discover/nobackup/cda/projects2/atms_recenter_m3/center" %}
 {% set EXP_DIR= "/discover/nobackup/cda/projects2/atms_recenter_m3" %}
 {% set SHARED_TMP_DIR= "/discover/nobackup/cda/projects2/tmp_atms_recenter_m3" %}
 {% set INITIAL_CYCLE_POINT = "2019-09-21T21Z" %}

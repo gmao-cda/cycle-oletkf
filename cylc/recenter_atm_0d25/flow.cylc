@@ -178,20 +178,17 @@
         execution time limit = PT10M
         script = """
                  echo "run_recenter $CYCLE_DATE"
-                 PYTHONPATH={{CYCLE_LETKF_SRCS}} {{CYCLE_LETKF_SRCS}}/run_recenter.py {{SHARED_TMP_DIR}}/${CYCLE_DATE}_recenter \
+                 PYTHONPATH={{CYCLE_LETKF_SRCS}} {{CYCLE_LETKF_SRCS}}/run_atms_recenter.py {{SHARED_TMP_DIR}}/${CYCLE_DATE}_recenter \
+                 --cntrDir      {{CENTER_DIR}}/${NEXT_CYCLE_DATE} \
                  --ensize       {{MEMBERS}} \
-                 --letkfExec    {{OLETKF_EXEC_DIR}}/OCN.letkf_mom6.x \
-                 --nprocs       {{NPROCS_LETKF}} \
-                 --rstFile      {{EXP_DIR}}/bkgd/0001/${NEXT_CYCLE_DATE}/RESTART/MOM.res.nc \
-                 --staticFile   {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst0001/scratch/ocean_static.nc \
-                 --topoFile     {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst0001/scratch/INPUT/ocean_topog.nc \
-                 --nml          {{CYCLE_LETKF_SRCS}}/cylc/cpld_odas_0d25/etc/input.nml.letkf.0d25deg \
-                 --bkgdFile1Tpl gs01#MEMBER#.MOM.res.nc \
-                 --bkgdFile2Tpl gs01#MEMBER#.MOM.res_1.nc \
-                 --analFile1Tpl anal#MEMBER#.MOM.res.nc \
-                 --analFile2Tpl anal#MEMBER#.MOM.res_1.nc \
-                 --obsFileTpl   obs01#MEMBER#.dat \
-                 --strLength 3
+                 --recenterExec {{RECENTER_EXEC_DIR}}/recenter.x \
+                 --nprocs       {{NPROCS_RECENTER}} \
+                 --bkgdPrefixTpl "bkgd{:04d}" \
+                 --analPrefixTpl "anal{:04d}" \
+                 --cntrPrefix    "center" \
+                 --meanPrefix    "bkgdmean" \
+                 --sprdPrefix    "bkgdsprd" \
+                 --otherArgs     "-wrtmean T -wrtsprd T -clipq T -vt T"
                  """
 
         [[[environment]]]
