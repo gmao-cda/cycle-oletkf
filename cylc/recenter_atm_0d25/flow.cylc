@@ -205,9 +205,11 @@
     [[save_recenter_diag]]
         script = """
                  echo "save_recenter_diag  $CYCLE_DATE"
-                 {{CYCLE_LETKF_SRCS}}/save_recenter_diag.py {{SHARED_TMP_DIR}}/${CYCLE_DATE}_recenter \
-                 --bkgdMeanDir {{EXP_DIR}}/bkgd/mean/${NEXT_CYCLE_DATE} \
-                 --bkgdSprdDir {{EXP_DIR}}/bkgd/sprd/${NEXT_CYCLE_DATE} 
+                 {{CYCLE_LETKF_SRCS}}/save_atms_recenter_diag.py {{SHARED_TMP_DIR}}/${CYCLE_DATE}_recenter \
+                 --meanDir {{EXP_DIR}}/bkgd/mean/${NEXT_CYCLE_DATE} \
+                 --sprdDir {{EXP_DIR}}/bkgd/sprd/${NEXT_CYCLE_DATE} \
+                 --meanPrefix "bkgdmean" \
+                 --sprdPrefix "bkgdsprd"
                  """
         [[[environment]]]
 
