@@ -61,6 +61,7 @@ def parse_cmd_line():
     parser.add_argument("--sprdDir", required=True, help=(""))
     parser.add_argument("--meanPrefix", required=False, default="bkgdmean", help=(""))
     parser.add_argument("--sprdPrefix", required=False, default="bkgdsprd", help=(""))
+    parser.add_argument('--skip', action=argparse.BooleanOptionalAction,required=False, default=False)
 
     args = parser.parse_args()
 
@@ -75,7 +76,8 @@ def parse_cmd_line():
 
 if __name__ == '__main__':
     args = parse_cmd_line()
-    save_recenter_diag_output( args.recenterDir, \
+    if not args.skip:
+        save_recenter_diag_output( args.recenterDir, \
                                args.meanDir, \
                                args.sprdDir,\
                                args.meanPrefix, \

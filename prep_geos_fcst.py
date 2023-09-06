@@ -20,6 +20,7 @@ def parse_cmd_line():
     parser.add_argument("--fwdExec", required=True, default="./GEOSgcm.x", help=("path where GEOSgcm.x is"))
     parser.add_argument("--fcstStartDate", required=True, default="20200101T00", help=("cycle date"))
     parser.add_argument("--fcstHrs", required=True, default=6, type=int, help=("forecast length (hours)"))
+    parser.add_argument('--skip', action=argparse.BooleanOptionalAction,required=False, default=False)
 
     args = parser.parse_args()
 
@@ -140,7 +141,8 @@ def prep_geos_fcst_dir(wkdir         = None, \
 
 if __name__ == '__main__':
     args = parse_cmd_line()
-    prep_geos_fcst_dir(args.wkdir, \
+    if not args.skip:
+        prep_geos_fcst_dir(args.wkdir, \
                        args.expTplDir, \
                        args.cycleAnalDir, \
                        args.cycleBkgdDir, \

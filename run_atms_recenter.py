@@ -176,6 +176,7 @@ def parse_cmd_line():
     parser.add_argument("--meanPrefix", required=True, default="bkgdmean", help=())
     parser.add_argument("--sprdPrefix", required=True, default="bkgdsprd", help=())
     parser.add_argument("--otherArgs",     required=False, type=str, default=None, help=())
+    parser.add_argument('--skip', action=argparse.BooleanOptionalAction,required=False, default=False)
 
     args = parser.parse_args()
 
@@ -189,7 +190,8 @@ def parse_cmd_line():
 
 if __name__ == '__main__':
     args = parse_cmd_line()
-    run_das_recenter(args.wkdir, \
+    if not args.skip:
+        run_das_recenter(args.wkdir, \
                      args.cntrDir, \
                      args.ensize, \
                      args.recenterExec, \

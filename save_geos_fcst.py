@@ -24,6 +24,7 @@ def parse_cmd_line():
     parser = argparse.ArgumentParser(description=(""))
     parser.add_argument("srcDir", help=(""))
     parser.add_argument("dstDir", help=(""))
+    parser.add_argument('--skip', action=argparse.BooleanOptionalAction,required=False, default=False)
 
     args = parser.parse_args()
 
@@ -89,4 +90,5 @@ def save_geos_output( srcDir = os.path.abspath("./source_dir"), \
 
 if __name__ == '__main__':
     args = parse_cmd_line()
-    save_geos_output(args.srcDir, args.dstDir)
+    if not args.skip:
+        save_geos_output(args.srcDir, args.dstDir)

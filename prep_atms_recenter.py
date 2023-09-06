@@ -71,6 +71,7 @@ def parse_cmd_line():
     parser.add_argument("wkdir", help=("where to run recenter"))
     parser.add_argument("--memDir", required=True, help=(""))
     parser.add_argument("--member", required=True,type=int,help=("which member"))
+    parser.add_argument('--skip', action=argparse.BooleanOptionalAction,required=False, default=False)
 
     args = parser.parse_args()
 
@@ -83,7 +84,8 @@ def parse_cmd_line():
 
 if __name__ == '__main__':
     args = parse_cmd_line()
-    prep_recenter_1mem(args.wkdir, \
+    if not args.skip:
+        prep_recenter_1mem(args.wkdir, \
                     args.memDir, \
                     args.member)
 

@@ -7,7 +7,7 @@
     initial cycle point = {{INITIAL_CYCLE_POINT}}
     final cycle point = {{FINAL_CYCLE_POINT}}
     [[graph]]
-        PT6H = """
+        PT24H = """
             {% for imem in range(1,MEMBERS+1) %}
             prep_geos_fcst_{{imem}} => geos_fcst_{{imem}} => save_fcst_{{imem}} 
 
@@ -16,9 +16,9 @@
             run_recenter => save_recenter_{{imem}} => save_recenter_diag => clean_recenter_tmpdir
             {% endfor %}
                 """
-        +PT6H/PT6H = """
+        +PT24H/PT24H = """
             {% for imem in range(1,MEMBERS+1) %}
-            clean_recenter_tmpdir[-PT6H] => prep_geos_fcst_{{imem}}
+            clean_recenter_tmpdir[-PT24H] => prep_geos_fcst_{{imem}}
             {% endfor %}
 
                     """
@@ -49,8 +49,8 @@
             CYCLE_F1H_DATE=$(cylc cycle-point --offset-hours=1 --template=%Y%m%dT%H)
             CYCLE_F6H_DATE=$(cylc cycle-point --offset-hours=6 --template=%Y%m%dT%H)
 
-            NEXT_CYCLE_DATE=$(cylc cycle-point --offset-hours=6 --template=%Y%m%dT%H)
-            NEXT_CYCLE_YYYY_MM_DD_HH=$(cylc cycle-point --offset-hours=6 --template=%Y_%m_%d_%H)
+            NEXT_CYCLE_DATE=$(cylc cycle-point --offset-hours=24 --template=%Y%m%dT%H)
+            NEXT_CYCLE_YYYY_MM_DD_HH=$(cylc cycle-point --offset-hours=24 --template=%Y_%m_%d_%H)
 
     #---------------------------------------------------------------------------
     # task group for tasks with an ensemble dimension
@@ -74,7 +74,8 @@
                  --cycleAnalDir {{EXP_DIR}}/anal/${C4MEM}/${CYCLE_DATE} \
                  --fwdExec {{FWD_EXEC}} \
                  --fcstStartDate ${CYCLE_DATE} \
-                 --fcstHrs {{FCST_HRS}}
+                 --fcstHrs {{FCST_HRS}} \
+                 {{SKIP_OPT_PREP_GEOS_FCST_MEM}}
                  """
         inherit = GROUP_PREP_GEOS
         [[[environment]]]
@@ -88,7 +89,7 @@
     {% for imem in range(1,MEMBERS+1) %}
     [[geos_fcst_{{imem}}]]
         platform = discover
-        execution time limit = PT20M
+        execution time limit = PT40M
         script = """
                  echo "geos_fcst {{imem}} $CYCLE_DATE"
 
@@ -104,7 +105,8 @@
                  --site {{SITE}} \
                  --ncpus 1215 \
                  --ncpusPerNode 45 \
-                 --bkgdSaveDir {{EXP_DIR}}/bkgd/${C4MEM}/${NEXT_CYCLE_DATE}
+                 --bkgdSaveDir {{EXP_DIR}}/bkgd/${C4MEM}/${NEXT_CYCLE_DATE} \
+                 {{SKIP_OPT_GEOS_FCST_MEM}}
 
                  echo "{{EXP_DIR}}/bkgd/${C4MEM}/${NEXT_CYCLE_DATE}"
                  """
@@ -129,7 +131,8 @@
         script = """
                  echo "save_geos_fcst ${C4MEM} $CYCLE_DATE"
                  {{CYCLE_LETKF_SRCS}}/save_geos_fcst.py {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst${C4MEM}/scratch \
-                 {{EXP_DIR}}/bkgd/${C4MEM}/${NEXT_CYCLE_DATE}
+                 {{EXP_DIR}}/bkgd/${C4MEM}/${NEXT_CYCLE_DATE} \
+                 {{SKIP_OPT_SAVE_FCST_MEM}}
                  """
         inherit = GROUP_SAVE_GEOS
         [[[environment]]]
@@ -144,7 +147,8 @@
     [[create_recenter_dir]]
         script = """
                  echo "create_recenter_dir $CYCLE_DATE"
-                 {{CYCLE_LETKF_SRCS}}/create_letkf_dir.py {{SHARED_TMP_DIR}}/${CYCLE_DATE}_recenter
+                 {{CYCLE_LETKF_SRCS}}/create_letkf_dir.py {{SHARED_TMP_DIR}}/${CYCLE_DATE}_recenter \
+                 {{SKIP_OPT_CREATE_RECENTER_DIR}}
                  """
         [[[environment]]]
 
@@ -158,13 +162,12 @@
                  echo "prep_recenter {{imem}} $CYCLE_DATE"
                  {{CYCLE_LETKF_SRCS}}/prep_atms_recenter.py {{SHARED_TMP_DIR}}/${CYCLE_DATE}_recenter \
                  --memDir {{EXP_DIR}}/bkgd/${C4MEM}/${NEXT_CYCLE_DATE} \
-                 --member {{imem}}
+                 --member {{imem}} \
+                 {{SKIP_OPT_PREP_RECENTER_MEM}}
 
                  """
         inherit = GROUP_PREP_RECENTER
         [[[environment]]]
-        CYCLE_DATE=$(cylc cycle-point --template=%Y%m%dT%H)
-        NEXT_CYCLE_DATE=$(cylc cycle-point --offset-hours=6 --template=%Y%m%dT%H)
         C4MEM=$(printf "%4.4d" {{imem}})
 
  
@@ -188,7 +191,8 @@
                  --cntrPrefix    "center" \
                  --meanPrefix    "bkgdmean" \
                  --sprdPrefix    "bkgdsprd" \
-                 --otherArgs     "-wrtmean T -wrtsprd T -clipq T -vt T"
+                 --otherArgs     "-wrtmean T -wrtsprd T -clipq T -vt T" \
+                 {{SKIP_OPT_RUN_RECENTER}}
                  """
 
         [[[environment]]]
@@ -209,7 +213,8 @@
                  --meanDir {{EXP_DIR}}/bkgd/mean/${NEXT_CYCLE_DATE} \
                  --sprdDir {{EXP_DIR}}/bkgd/sprd/${NEXT_CYCLE_DATE} \
                  --meanPrefix "bkgdmean" \
-                 --sprdPrefix "bkgdsprd"
+                 --sprdPrefix "bkgdsprd" \
+                 {{SKIP_OPT_SAVE_RECENTER_DIAG}}
                  """
         [[[environment]]]
 
@@ -223,7 +228,8 @@
                  {{CYCLE_LETKF_SRCS}}/save_atms_recenter_mem.py {{SHARED_TMP_DIR}}/${CYCLE_DATE}_recenter \
                  --saveDir {{EXP_DIR}}/anal/${C4MEM}/${NEXT_CYCLE_DATE} \
                  --member {{imem}} \
-                 --analPrefixTpl "anal{:04d}"
+                 --analPrefixTpl "anal{:04d}" \
+                 {{SKIP_OPT_SAVE_RECENTER_MEM}}
                  """
         inherit = GROUP_SAVE_RECENTER
         [[[environment]]]

@@ -10,13 +10,22 @@
 {% set HPC_GROUP_ACCOUNT = "s2647" %}
 {% set HPC_QOS = "allnccs" %}
 
-{% set NJOBS_FOR_PREP_GEOS = 5 %}
-{% set NJOBS_FOR_FCST_GEOS = 4 %}
-{% set NJOBS_FOR_SAVE_GEOS = 5 %}
+{% set NJOBS_FOR_PREP_GEOS     = 5 %}
+{% set NJOBS_FOR_FCST_GEOS     = 4 %}
+{% set NJOBS_FOR_SAVE_GEOS     = 5 %}
 {% set NJOBS_FOR_PREP_RECENTER = 5 %}
 {% set NJOBS_FOR_SAVE_RECENTER = 5 %}
 
-{% set SKIP_OPT_CLEAN_TMP = "--skip" %}
+
+{% set SKIP_OPT_PREP_GEOS_FCST_MEM  = "--no-skip" %}
+{% set SKIP_OPT_GEOS_FCST_MEM       = "--no-skip" %}
+{% set SKIP_OPT_SAVE_FCST_MEM       = "--no-skip" %}
+{% set SKIP_OPT_CREATE_RECENTER_DIR = "--no-skip" %}
+{% set SKIP_OPT_PREP_RECENTER_MEM   = "--no-skip" %}
+{% set SKIP_OPT_RUN_RECENTER        = "--no-skip" %}
+{% set SKIP_OPT_SAVE_RECENTER_DIAG  = "--no-skip" %}
+{% set SKIP_OPT_SAVE_RECENTER_MEM   = "--no-skip" %}
+{% set SKIP_OPT_CLEAN_TMP           = "--no-skip" %}
 
 
 {% set MEMBERS = 3 %}

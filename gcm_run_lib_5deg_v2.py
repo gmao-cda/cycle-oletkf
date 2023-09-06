@@ -769,6 +769,7 @@ def parse_cmd_line():
     parser.add_argument("--bkgdSaveDir", required=True, default=None, help=("bkgdDir storing other files to run GEOSgcm"))
     parser.add_argument("--hist2dSaveDir", required=False, default=None, help=(""))
     parser.add_argument("--hist3dSaveDir", required=False, default=None, help=(""))
+    parser.add_argument('--skip', action=argparse.BooleanOptionalAction,required=False, default=False)
 
     args = parser.parse_args()
 
@@ -829,7 +830,8 @@ def run_geos( expDir  = "/discover/nobackup/cda/projects2/tmp/20170101T00_fcst00
 
 if __name__ == '__main__':
     args = parse_cmd_line()
-    run_geos( expDir  = args.expDir, \
+    if not args.skip:
+        run_geos( expDir  = args.expDir, \
               flowDir = args.flowDir, \
               geosDir = args.geosDir, \
               site    = args.site, \

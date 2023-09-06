@@ -24,6 +24,7 @@ def create_empty_dir(wkdir = "./"):
 def parse_cmd_line():
     parser = argparse.ArgumentParser(description=("Prepare a directory to run letkf"))
     parser.add_argument("wkdir", help=("where to run letkf"))
+    parser.add_argument('--skip', action=argparse.BooleanOptionalAction,required=False, default=False)
 
     args = parser.parse_args()
 
@@ -35,5 +36,6 @@ def parse_cmd_line():
 
 if __name__ == '__main__':
     args = parse_cmd_line()
-    create_empty_dir(args.wkdir)
+    if not args.skip:
+        create_empty_dir(args.wkdir)
 
