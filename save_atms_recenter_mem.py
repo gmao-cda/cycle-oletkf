@@ -21,13 +21,13 @@ def save_recenter_mem_output(recenterDir    = os.path.abspath("./"), \
                                  member     = 1, \
                               analPrefixTpl = "anal{:04d}"):
     
-    if not os.path.exists(saveDir):
-        raise RuntimeError("recenterDir ({}) does not exist".format(saveDir))
-        sys.exit(1)
-
     if not os.path.exists(recenterDir):
         raise RuntimeError("recenterDir ({}) does not exist".format(recenterDir))
-        sys.exit(2)
+        sys.exit(1)
+
+    if not os.path.exists(saveDir):
+        print("saveDir ({}) does not exist. creating it".format(saveDir))
+        os.makedirs(saveDir, exist_ok = True)
 
     srcDir = recenterDir
     dstDir = saveDir
