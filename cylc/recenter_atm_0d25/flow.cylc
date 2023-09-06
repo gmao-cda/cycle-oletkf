@@ -13,12 +13,12 @@
 
             save_fcst_{{imem}} => create_recenter_dir => prep_recenter_{{imem}} => run_recenter 
 
-            run_recenter => save_recenter_{{imem}} => save_recenter_diag
+            run_recenter => save_recenter_{{imem}} => save_recenter_diag => clean_recenter_tmpdir
             {% endfor %}
                 """
         +PT6H/PT6H = """
             {% for imem in range(1,MEMBERS+1) %}
-            save_recenter_diag[-PT6H] => prep_geos_fcst_{{imem}}
+            clean_recenter_tmpdir[-PT6H] => prep_geos_fcst_{{imem}}
             {% endfor %}
 
                     """
@@ -220,11 +220,10 @@
     [[save_recenter_{{imem}}]]
         script = """
                  echo "save_recenter_mem ${C4MEM} $CYCLE_DATE"
-                 {{CYCLE_LETKF_SRCS}}/save_recenter_mem.py {{EXP_DIR}}/anal/${C4MEM}/${NEXT_CYCLE_DATE} \
-                 --cntrDir {{SHARED_TMP_DIR}}/${CYCLE_DATE}_recenter \
-                 --bkgdDir  {{EXP_DIR}}/bkgd/${C4MEM}/${NEXT_CYCLE_DATE}  \
-                 --res 0d25 \
-                 --member {{imem}}
+                 {{CYCLE_LETKF_SRCS}}/save_atms_recenter_mem.py {{SHARED_TMP_DIR}}/${CYCLE_DATE}_recenter \
+                 --saveDir {{EXP_DIR}}/anal/${C4MEM}/${NEXT_CYCLE_DATE} \
+                 --member {{imem}} \
+                 --analPrefixTpl "anal{:04d}"
                  """
         inherit = GROUP_SAVE_RECENTER
         [[[environment]]]
@@ -232,5 +231,18 @@
 
     {% endfor %}
 
+    #---------------------------------------------------------------------------
+    # clean_tmpdir
+    #
+    [[clean_recenter_tmpdir]]
+        script = """
+                 echo "clean_tmpdir  $CYCLE_DATE"
+                 {{CYCLE_LETKF_SRCS}}/clean_atms_recenter_tmpdir.py \
+                 --recenterDir {{SHARED_TMP_DIR}}/${CYCLE_DATE}_recenter \
+                 --fcstDirTpl  {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst{:04d} \
+                 --ensize       {{MEMBERS}} \
+                 {{SKIP_OPT_CLEAN_TMP}}
+                 """
+ 
 
 

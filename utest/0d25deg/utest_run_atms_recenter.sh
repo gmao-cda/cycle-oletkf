@@ -2,7 +2,7 @@
 #SBATCH -N 1
 #SBATCH --ntasks=3
 #SBATCH --qos=debug
-#SBATCH --time=10:00
+#SBATCH --time=5:00
 #SBATCH --account=s2647
 
 
@@ -25,12 +25,12 @@ PYTHONPATH=${CYCLE_LETKF_SRCS} ${CYCLE_LETKF_SRCS}/run_atms_recenter.py ${wkdir}
  --ensize         ${MEMBERS} \
  --recenterExec   ${RECENTER_EXEC_DIR}/recenter.x \
  --nprocs         ${NPROCS} \
- --bkgdPrefixTpl  'bkgd{:04d}' \
- --analPrefixTpl  'anal{:04d}' \
- --cntrPrefix     'center' \
- --meanPrefix     'bkgdmean' \
- --sprdPrefix     'bkgdsprd' \
- --otherArgs      '-wrtmean T -wrtsprd T -clipq T -vt T'
+ --bkgdPrefixTpl  "bkgd{:04d}" \
+ --analPrefixTpl  "anal{:04d}" \
+ --cntrPrefix     "center" \
+ --meanPrefix     "bkgdmean" \
+ --sprdPrefix     "bkgdsprd" \
+ --otherArgs      "-wrtmean T -wrtsprd T -clipq T -vt T"
 # "
 #echo $cmd 
 #$cmd

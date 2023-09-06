@@ -16,6 +16,8 @@
 {% set NJOBS_FOR_PREP_RECENTER = 5 %}
 {% set NJOBS_FOR_SAVE_RECENTER = 5 %}
 
+{% set SKIP_OPT_CLEAN_TMP = "--skip" %}
+
 
 {% set MEMBERS = 3 %}
 {% set CENTER_DIR = "/discover/nobackup/cda/projects2/atms_recenter_m3/center" %}

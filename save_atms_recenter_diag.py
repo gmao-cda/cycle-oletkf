@@ -16,7 +16,7 @@ def save_recenter_diag_output( recenterDir = os.path.abspath("./"), \
                                sprdPrefix = "bkgdsprd" ):
 
     if not os.path.exists(recenterDir):
-        raise RuntimeError("recenterDir ({}) does not exist.".format(recenterDir))
+        raise RuntimeError(f"recenterDir ({recenterDir}) does not exist.")
         sys.exit(1)
     
     dnames    = ["meanDir", "sprdDir"]
@@ -24,6 +24,13 @@ def save_recenter_diag_output( recenterDir = os.path.abspath("./"), \
     prefix    = [meanPrefix, sprdPrefix]
     fileList  = [["{}.{}".format(meanPrefix,f) for f in rstFiles ], \
                  ["{}.{}".format(sprdPrefix,f) for f in rstFiles ]]
+
+    for files in fileList:
+        for f in files:
+            fpath = os.path.join(recenterDir, f)
+            if not os.path.exists(fpath):
+                raise RuntimeError(f"required file ({fpath}) does not exist.")
+                sys.exit(2)
 
     for dnm, d, files in zip(dnames, dirs, fileList):
         srcDir = recenterDir
