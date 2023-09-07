@@ -1,0 +1,46 @@
+{% set MY_NAME = "atms_recenter_0d25_m20" %}
+
+{% set CYCLE_LETKF_SRCS = "/discover/nobackup/cda/develop_space/cycle-oletkf" %}
+
+{% set GEOS_DIR = "/discover/nobackup/projects/gmao/scda_iesa/cda/GEOSgcm_08Nov2022/install" %}
+{% set FWD_EXEC = "/discover/nobackup/projects/gmao/scda_iesa/cda/GEOSgcm_08Nov2022/install/bin/GEOSgcm.x" %}
+{% set SITE = "NCCS" %}
+
+{% set RECENTER_EXEC_DIR = "/discover/nobackup/cda/develop_space/GEOSFV3-LETKF/build_discover/utils" %}
+{% set NPROCS_RECENTER = 20 %}
+
+{% set HPC_GROUP_ACCOUNT = "s2647" %}
+{% set HPC_QOS_FAST     = "allnccs" %}
+{% set HPC_QOS_NORMAL   = "allnccs" %}
+
+{% set NJOBS_FOR_PREP_GEOS          = 5 %}
+{% set NJOBS_FOR_FCST_GEOS          = 4 %}
+{% set NJOBS_FOR_SAVE_GEOS          = 5 %}
+{% set NJOBS_FOR_PREP_RECENTER      = 5 %}
+{% set NJOBS_FOR_SAVE_RECENTER      = 5 %}
+{% set NJOBS_FOR_RECONCILE_RECENTER = 5 %}
+
+{% set SKIP_OPT_PREP_GEOS_FCST_MEM      = "--no-skip" %}
+{% set SKIP_OPT_GEOS_FCST_MEM           = "--no-skip" %}
+{% set SKIP_OPT_SAVE_FCST_MEM           = "--no-skip" %}
+{% set SKIP_OPT_CREATE_RECENTER_DIR     = "--no-skip" %}
+{% set SKIP_OPT_PREP_RECENTER_MEM       = "--no-skip" %}
+{% set SKIP_OPT_RUN_RECENTER            = "--no-skip" %}
+{% set SKIP_OPT_SAVE_RECENTER_DIAG      = "--no-skip" %}
+{% set SKIP_OPT_SAVE_RECENTER_MEM       = "--no-skip" %}
+{% set SKIP_OPT_RECONCILE_RECENTER_MEM  = "--no-skip" %}
+{% set SKIP_OPT_CLEAN_TMP               = "--no-skip" %}
+
+
+{% set MEMBERS = 20 %}
+
+{% set CENTER_DIR = "/discover/nobackup/projects/gmao/scda_iesa/cda/formal_exp/recenter_m20/center" %}
+{% set EXP_DIR= "/discover/nobackup/projects/gmao/scda_iesa/cda/formal_exp/recenter_m20" %}
+{% set SHARED_TMP_DIR= "/discover/nobackup/projects/gmao/scda_iesa/cda/formal_exp/tmp_recenter_m20" %}
+
+{% set INITIAL_CYCLE_POINT = "2019-09-21T21Z" %}
+{% set FINAL_CYCLE_POINT = "2019-09-30T21Z" %}
+
+{% set FCST_HRS = 24 %}
+
+

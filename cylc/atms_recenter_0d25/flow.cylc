@@ -1,0 +1,278 @@
+#!jinja2
+%include settings.rc
+
+[scheduler]
+    UTC mode = True
+[scheduling]
+    initial cycle point = {{INITIAL_CYCLE_POINT}}
+    final cycle point = {{FINAL_CYCLE_POINT}}
+    [[graph]]
+        PT24H = """
+            {% for imem in range(1,MEMBERS+1) %}
+            prep_geos_fcst_{{imem}} => geos_fcst_{{imem}} => save_fcst_{{imem}} 
+
+            save_fcst_{{imem}} => create_recenter_dir => prep_recenter_{{imem}} => run_recenter 
+
+            run_recenter => save_recenter_{{imem}} => reconcile_recenter_{{imem}} => save_recenter_diag => clean_recenter_tmpdir
+            {% endfor %}
+                """
+        +PT24H/PT24H = """
+            {% for imem in range(1,MEMBERS+1) %}
+            clean_recenter_tmpdir[-PT24H] => prep_geos_fcst_{{imem}}
+            {% endfor %}
+
+                    """
+    [[queues]]
+       [[[prep_geos_queue]]]
+          limit = {{NJOBS_FOR_PREP_GEOS}}
+          members = GROUP_PREP_GEOS
+       [[[fcst_geos_queue]]]
+          limit = {{NJOBS_FOR_FCST_GEOS}}
+          members = GROUP_FCST_GEOS
+       [[[save_geos_queue]]]
+          limit = {{NJOBS_FOR_SAVE_GEOS}}
+          members = GROUP_SAVE_GEOS
+       [[[prep_recenter_queue]]]
+          limit = {{NJOBS_FOR_PREP_RECENTER}}
+          members = GROUP_PREP_RECENTER
+       [[[save_recenter_queue]]]
+          limit = {{NJOBS_FOR_SAVE_RECENTER}}
+          members = GROUP_SAVE_RECENTER
+       [[[reconcile_recenter_queue]]]
+          limit = {{NJOBS_FOR_RECONCILE_RECENTER}}
+          members = GROUP_RECONCILE_RECENTER
+[runtime]
+    #---------------------------------------------------------------------------
+    # env shared by all tasks
+    #
+    [[root]]
+        [[[environment]]]
+            CYCLE_DATE=$(cylc cycle-point --template=%Y%m%dT%H)
+            CYCLE_F1H_DATE=$(cylc cycle-point --offset-hours=1 --template=%Y%m%dT%H)
+            CYCLE_F6H_DATE=$(cylc cycle-point --offset-hours=6 --template=%Y%m%dT%H)
+
+            NEXT_CYCLE_DATE=$(cylc cycle-point --offset-hours=24 --template=%Y%m%dT%H)
+            NEXT_CYCLE_YYYY_MM_DD_HH=$(cylc cycle-point --offset-hours=24 --template=%Y_%m_%d_%H)
+
+    #---------------------------------------------------------------------------
+    # task group for tasks with an ensemble dimension
+    #
+    [[GROUP_PREP_GEOS]]
+    [[GROUP_FCST_GEOS]]
+    [[GROUP_SAVE_GEOS]]
+    [[GROUP_PREP_RECENTER]]
+    [[GROUP_SAVE_RECENTER]]
+    [[GROUP_RECONCILE_RECENTER]]
+
+    #---------------------------------------------------------------------------
+    # prepare exp dir
+    #
+    {% for imem in range(1,MEMBERS+1) %}
+    [[prep_geos_fcst_{{imem}}]]
+        script = """
+                 echo "prep_geos_fcst ${C4MEM} $CYCLE_DATE"
+                 {{CYCLE_LETKF_SRCS}}/prep_geos_fcst.py {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst${C4MEM} \
+                 --expTplDir {{CYCLE_LETKF_SRCS}}/exp_template/exp_template_0d25deg_less_out  \
+                 --cycleBkgdDir {{EXP_DIR}}/bkgd/${C4MEM}/${CYCLE_DATE} \
+                 --cycleAnalDir {{EXP_DIR}}/anal/${C4MEM}/${CYCLE_DATE} \
+                 --fwdExec {{FWD_EXEC}} \
+                 --fcstStartDate ${CYCLE_DATE} \
+                 --fcstHrs {{FCST_HRS}} \
+                 {{SKIP_OPT_PREP_GEOS_FCST_MEM}}
+                 """
+        inherit = GROUP_PREP_GEOS
+        [[[environment]]]
+            C4MEM=$(printf "%4.4d" {{imem}})
+
+    {% endfor %}
+
+    #---------------------------------------------------------------------------
+    # forecast job
+    #
+    {% for imem in range(1,MEMBERS+1) %}
+    [[geos_fcst_{{imem}}]]
+        platform = discover
+        execution time limit = PT30M
+        script = """
+                 echo "geos_fcst {{imem}} $CYCLE_DATE"
+
+                 umask 022
+                 ulimit -s unlimited
+                 source {{CYCLE_LETKF_SRCS}}/cylc/{{MY_NAME}}/etc/env.sh
+
+                 PYTHONPATH={{CYCLE_LETKF_SRCS}} {{CYCLE_LETKF_SRCS}}/gcm_run_lib_v2.py {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst${C4MEM} \
+                 --flowDir {{CYCLE_LETKF_SRCS}} \
+                 --geosDir {{GEOS_DIR}} \
+                 --site {{SITE}} \
+                 --ncpus 1215 \
+                 --ncpusPerNode 45 \
+                 --bkgdSaveDir {{EXP_DIR}}/bkgd/${C4MEM}/${NEXT_CYCLE_DATE} \
+                 {{SKIP_OPT_GEOS_FCST_MEM}}
+
+                 echo "{{EXP_DIR}}/bkgd/${C4MEM}/${NEXT_CYCLE_DATE}"
+                 """
+        inherit = GROUP_FCST_GEOS
+        [[[environment]]]
+            C4MEM=$(printf "%4.4d" {{imem}})
+
+        [[[directives]]]
+            --nodes = 27
+            --ntasks-per-node = 45
+            --constraint = cas
+            --account = {{HPC_GROUP_ACCOUNT}}
+            --qos = {{HPC_QOS_NORMAL}}
+
+    {% endfor %}
+     
+    #---------------------------------------------------------------------------
+    # save geos fcst
+    #
+    {% for imem in range(1,MEMBERS+1) %}
+    [[save_fcst_{{imem}}]]
+        script = """
+                 echo "save_geos_fcst ${C4MEM} $CYCLE_DATE"
+                 {{CYCLE_LETKF_SRCS}}/save_geos_fcst.py {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst${C4MEM}/scratch \
+                 {{EXP_DIR}}/bkgd/${C4MEM}/${NEXT_CYCLE_DATE} \
+                 {{SKIP_OPT_SAVE_FCST_MEM}}
+                 """
+        inherit = GROUP_SAVE_GEOS
+        [[[environment]]]
+            C4MEM=$(printf "%4.4d" {{imem}})
+
+    {% endfor %}
+
+
+    #---------------------------------------------------------------------------
+    # create recenter dir
+    #
+    [[create_recenter_dir]]
+        script = """
+                 echo "create_recenter_dir $CYCLE_DATE"
+                 {{CYCLE_LETKF_SRCS}}/create_letkf_dir.py {{SHARED_TMP_DIR}}/${CYCLE_DATE}_recenter \
+                 {{SKIP_OPT_CREATE_RECENTER_DIR}}
+                 """
+        [[[environment]]]
+
+
+    #---------------------------------------------------------------------------
+    # prepare bgkd for recenter members
+    #
+    {% for imem in range(1,MEMBERS+1) %}
+    [[prep_recenter_{{imem}}]]
+        script = """
+                 echo "prep_recenter {{imem}} $CYCLE_DATE"
+                 {{CYCLE_LETKF_SRCS}}/prep_atms_recenter.py {{SHARED_TMP_DIR}}/${CYCLE_DATE}_recenter \
+                 --memDir {{EXP_DIR}}/bkgd/${C4MEM}/${NEXT_CYCLE_DATE} \
+                 --member {{imem}} \
+                 {{SKIP_OPT_PREP_RECENTER_MEM}}
+
+                 """
+        inherit = GROUP_PREP_RECENTER
+        [[[environment]]]
+        C4MEM=$(printf "%4.4d" {{imem}})
+
+ 
+    {% endfor %}
+
+    #---------------------------------------------------------------------------
+    # run recenter
+    #
+    [[run_recenter]]
+        platform = discover
+        execution time limit = PT10M
+        script = """
+                 echo "run_recenter $CYCLE_DATE"
+
+                 umask 022
+                 ulimit -s unlimited
+
+                 PYTHONPATH={{CYCLE_LETKF_SRCS}} {{CYCLE_LETKF_SRCS}}/run_atms_recenter.py {{SHARED_TMP_DIR}}/${CYCLE_DATE}_recenter \
+                 --cntrDir      {{CENTER_DIR}}/${NEXT_CYCLE_DATE} \
+                 --ensize       {{MEMBERS}} \
+                 --recenterExec {{RECENTER_EXEC_DIR}}/recenter.x \
+                 --nprocs       {{NPROCS_RECENTER}} \
+                 --bkgdPrefixTpl "bkgd{:04d}" \
+                 --analPrefixTpl "anal{:04d}" \
+                 --cntrPrefix    "center" \
+                 --meanPrefix    "bkgdmean" \
+                 --sprdPrefix    "bkgdsprd" \
+                 --otherArgs     "-wrtmean T -wrtsprd T -clipq T -vt T" \
+                 {{SKIP_OPT_RUN_RECENTER}}
+                 """
+
+        [[[environment]]]
+
+        [[[directives]]]
+            --nodes = 1
+            --constraint = cas
+            --account = {{HPC_GROUP_ACCOUNT}}
+            --qos = {{HPC_QOS_FAST}}
+
+    #---------------------------------------------------------------------------
+    # save recenter diag: save ensemble mean before recenter & sprd 
+    #
+    [[save_recenter_diag]]
+        script = """
+                 echo "save_recenter_diag  $CYCLE_DATE"
+                 {{CYCLE_LETKF_SRCS}}/save_atms_recenter_diag.py {{SHARED_TMP_DIR}}/${CYCLE_DATE}_recenter \
+                 --meanDir {{EXP_DIR}}/bkgd/mean/${NEXT_CYCLE_DATE} \
+                 --sprdDir {{EXP_DIR}}/bkgd/sprd/${NEXT_CYCLE_DATE} \
+                 --meanPrefix "bkgdmean" \
+                 --sprdPrefix "bkgdsprd" \
+                 {{SKIP_OPT_SAVE_RECENTER_DIAG}}
+                 """
+        [[[environment]]]
+
+    #---------------------------------------------------------------------------
+    # save recenter mem
+    #
+    {% for imem in range(1,MEMBERS+1) %}
+    [[save_recenter_{{imem}}]]
+        script = """
+                 echo "save_recenter_mem ${C4MEM} $CYCLE_DATE"
+                 {{CYCLE_LETKF_SRCS}}/save_atms_recenter_mem.py {{SHARED_TMP_DIR}}/${CYCLE_DATE}_recenter \
+                 --saveDir {{EXP_DIR}}/anal/${C4MEM}/${NEXT_CYCLE_DATE} \
+                 --member {{imem}} \
+                 --analPrefixTpl "anal{:04d}" \
+                 {{SKIP_OPT_SAVE_RECENTER_MEM}}
+                 """
+        inherit = GROUP_SAVE_RECENTER
+        [[[environment]]]
+            C4MEM=$(printf "%4.4d" {{imem}})
+
+    {% endfor %}
+
+    #---------------------------------------------------------------------------
+    # move files to required locations to enable cylce (tmp)
+    #
+    {% for imem in range(1,MEMBERS+1) %}
+    [[reconcile_recenter_{{imem}}]]
+        script = """
+                 echo "reconcile_recenter_mem ${C4MEM} $CYCLE_DATE"
+                 {{CYCLE_LETKF_SRCS}}/reconcile_atms_recenter_mem.py \
+                 --bkgdDir {{EXP_DIR}}/bkgd/${C4MEM}/${NEXT_CYCLE_DATE} \
+                 --analDir {{EXP_DIR}}/anal/${C4MEM}/${NEXT_CYCLE_DATE} \
+                 {{SKIP_OPT_RECONCILE_RECENTER_MEM}}
+                 """
+        inherit = GROUP_RECONCILE_RECENTER
+        [[[environment]]]
+            C4MEM=$(printf "%4.4d" {{imem}})
+
+    {% endfor %}
+
+
+    #---------------------------------------------------------------------------
+    # clean_tmpdir
+    #
+    [[clean_recenter_tmpdir]]
+        script = """
+                 echo "clean_tmpdir  $CYCLE_DATE"
+                 {{CYCLE_LETKF_SRCS}}/clean_atms_recenter_tmpdir.py \
+                 --recenterDir {{SHARED_TMP_DIR}}/${CYCLE_DATE}_recenter \
+                 --fcstDirTpl  {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst{:04d} \
+                 --ensize       {{MEMBERS}} \
+                 {{SKIP_OPT_CLEAN_TMP}}
+                 """
+ 
+
+

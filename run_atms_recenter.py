@@ -157,11 +157,20 @@ def run_das_recenter(wkdir         = os.path.abspath("./"), \
     if rc != 0:
         raise RuntimeError("command ({}) failed with return code {}".format(shell_cmd, rc))
         sys.exit(4)
+
+    # print out log directly so it's shown in cylc log
+    shell_cmd = "cat NOUT-0000"
+    print(shell_cmd)
+    rc, msgOut = run_shell_cmd(cmd=shell_cmd, wkdir=wkdir, showError=True)
+    print(msgOut)
+
     
 
     if not os.path.exists(os.path.join(wkdir,"EGRESS")):
         raise RuntimeError(f"end signal EGRESS not found under wkdir ({wkdir})")
         sys.exit(5)
+    else:
+        print("EGRESS")
 
 def parse_cmd_line():
     parser = argparse.ArgumentParser(description=("run letkf"))
