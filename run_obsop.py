@@ -112,6 +112,7 @@ def parse_cmd_line():
     parser.add_argument("--obsFile", required=True,help=())
     parser.add_argument("--hxFile", required=True,help=()) # out
     parser.add_argument("--otherArgs",required=False,default=None)
+    parser.add_argument("--skip", action=argparse.BooleanOptionalAction,required=False, default=False)
 
     args = parser.parse_args()
 
@@ -134,7 +135,8 @@ def parse_cmd_line():
 
 if __name__ == '__main__':
     args = parse_cmd_line()
-    run_single_obsop( args.wkdir, \
+    if not args.skip:
+        run_single_obsop( args.wkdir, \
                       args.obsopExec, \
                       args.rstFile, \
                       args.staticFile, \
