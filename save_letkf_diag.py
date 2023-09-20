@@ -14,6 +14,7 @@ def parse_cmd_line():
     parser.add_argument("--analMeanDir", required=True, help=(""))
     parser.add_argument("--analSprdDir", required=True, help=(""))
     parser.add_argument("--ombDir",required=True, help=(""))
+    parser.add_argument("--skip", action=argparse.BooleanOptionalAction,required=False, default=False)
 
     args = parser.parse_args()
 
@@ -60,7 +61,8 @@ def save_letkf_diag_output( letkfDir    = os.path.abspath("./"), \
 
 if __name__ == '__main__':
     args = parse_cmd_line()
-    save_letkf_diag_output( args.letkfDir, \
+    if not args.skip:
+        save_letkf_diag_output( args.letkfDir, \
                             args.bkgdMeanDir, \
                             args.bkgdSprdDir, \
                             args.analMeanDir, \

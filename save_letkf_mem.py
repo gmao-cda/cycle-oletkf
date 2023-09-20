@@ -18,6 +18,7 @@ def parse_cmd_line():
     parser.add_argument("--bkgdDir", required=True, help=())
     parser.add_argument("--res", required=True, choices=["0d25","5"],help=())
     parser.add_argument("--member", required=True, type=int,help=())
+    parser.add_argument("--skip", action=argparse.BooleanOptionalAction,required=False, default=False)
 
     args = parser.parse_args()
     
@@ -83,7 +84,8 @@ def save_letkf_mem_output(analDir  = os.path.abspath("./"), \
 
 if __name__ == '__main__':
     args = parse_cmd_line()
-    save_letkf_mem_output(args.analDir, \
+    if not args.skip:
+        save_letkf_mem_output(args.analDir, \
                           args.letkfDir, \
                           args.bkgdDir, \
                           args.res, \
