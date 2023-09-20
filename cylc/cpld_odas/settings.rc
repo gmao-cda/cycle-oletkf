@@ -1,3 +1,5 @@
+{% set MY_NAME = "cpld_odas" %}
+
 {% set CYCLE_LETKF_SRCS = "/discover/nobackup/cda/develop_space/cycle-oletkf" %}
 
 {% set GEOS_DIR = "/discover/nobackup/projects/gmao/scda_iesa/cda/GEOSgcm_08Nov2022/install" %}
@@ -17,6 +19,19 @@
 {% set NJOBS_FOR_OBSOP = 5 %}
 {% set NJOBS_FOR_PREP_LETKF = 5 %}
 {% set NJOBS_FOR_SAVE_LETKF = 5 %}
+
+
+{% set SKIP_OPT_PREP_GEOS_FCST_MEM   = "--no-skip" %}
+{% set SKIP_OPT_GEOS_FCST_MEM        = "--no-skip" %}
+{% set SKIP_OPT_SAVE_FCST_MEM        = "--no-skip" %}
+{% set SKIP_OPT_OBSOP_MEM            = "--no-skip" %}
+{% set SKIP_OPT_CREATE_LETKF_DIR     = "--no-skip" %}
+{% set SKIP_OPT_PREP_LETKF_MEM       = "--no-skip" %}
+{% set SKIP_OPT_RUN_LETKF            = "--no-skip" %}
+{% set SKIP_OPT_SAVE_LETKF_DIAG      = "--no-skip" %}
+{% set SKIP_OPT_SAVE_LETKF_MEM       = "--no-skip" %}
+{% set SKIP_OPT_CLEAN_TMP            = "--no-skip" %}
+
 
 {% set MEMBERS = 3 %}
 {% set EXP_DIR="/discover/nobackup/cda/projects2/odas3_queue2" %}

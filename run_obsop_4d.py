@@ -161,6 +161,7 @@ def parse_cmd_line():
     parser.add_argument("--endDate",   required=False,type=str,default=None, metavar="YYYYMMDDHH", help=())
     parser.add_argument("--rinc",      required=False,type=int,default=0, help=("(hours)"))
     parser.add_argument("--otherArgs", required=False,type=str,default=None, help=("other args to obsop"))
+    parser.add_argument('--skip', action=argparse.BooleanOptionalAction,required=False, default=False)
 
     args = parser.parse_args()
 
@@ -190,7 +191,8 @@ def parse_cmd_line():
 
 if __name__ == '__main__':
     args = parse_cmd_line()
-    run_single_obsop( args.wkdir, \
+    if not args.skip:
+        run_single_obsop( args.wkdir, \
                       args.obsopExec, \
                       args.rstFile, \
                       args.staticFile, \

@@ -13,12 +13,12 @@
 
             save_fcst_{{imem}} => run_obsop_{{imem}} => create_letkf_dir => prep_letkf_{{imem}} => run_letkf 
 
-            run_letkf => save_letkf_{{imem}} => save_letkf_diag
+            run_letkf => save_letkf_{{imem}} => save_letkf_diag => clean_odas_tmpdir
             {% endfor %}
                 """
         +PT6H/PT6H = """
             {% for imem in range(1,MEMBERS+1) %}
-            save_letkf_diag[-PT6H] => prep_geos_fcst_{{imem}}
+            clean_odas_tmpdir[-PT6H] => prep_geos_fcst_{{imem}}
             {% endfor %}
 
                     """
@@ -80,7 +80,8 @@
                  --cycleAnalDir {{EXP_DIR}}/anal/${C4MEM}/${CYCLE_DATE} \
                  --fwdExec {{FWD_EXEC}} \
                  --fcstStartDate ${CYCLE_DATE} \
-                 --fcstHrs {{FCST_HRS}}
+                 --fcstHrs {{FCST_HRS}} \
+                 {{SKIP_OPT_PREP_GEOS_FCST_MEM}}
                  """
         inherit = GROUP_PREP_GEOS
         [[[environment]]]
@@ -100,9 +101,10 @@
 
                  umask 022
                  ulimit -s unlimited
-                 module use -a ~sakella/modulefiles
-                 module load python/17May2023
-                 ml
+                 #module use -a ~sakella/modulefiles
+                 #module load python/17May2023
+                 #ml
+                 source {{CYCLE_LETKF_SRCS}}/env/env.sh
 
                  PYTHONPATH={{CYCLE_LETKF_SRCS}} {{CYCLE_LETKF_SRCS}}/gcm_run_lib_5deg_v2.py {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst${C4MEM} \
                  --flowDir {{CYCLE_LETKF_SRCS}} \
@@ -110,9 +112,9 @@
                  --site {{SITE}} \
                  --ncpus 45 \
                  --ncpusPerNode 45 \
-                 --bkgdSaveDir {{EXP_DIR}}/bkgd/${C4MEM}/${NEXT_CYCLE_DATE}
+                 --bkgdSaveDir {{EXP_DIR}}/bkgd/${C4MEM}/${NEXT_CYCLE_DATE} \
+                 {{SKIP_OPT_GEOS_FCST_MEM}}
 
-                 echo "{{EXP_DIR}}/bkgd/${C4MEM}/${NEXT_CYCLE_DATE}"
                  """
         inherit = GROUP_FCST_GEOS
         [[[environment]]]
@@ -135,7 +137,8 @@
         script = """
                  echo "save_geos_fcst ${C4MEM} $CYCLE_DATE"
                  {{CYCLE_LETKF_SRCS}}/save_geos_fcst.py {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst${C4MEM}/scratch \
-                 {{EXP_DIR}}/bkgd/${C4MEM}/${NEXT_CYCLE_DATE}
+                 {{EXP_DIR}}/bkgd/${C4MEM}/${NEXT_CYCLE_DATE} \
+                 {{SKIP_OPT_SAVE_FCST_MEM}}
                  """
         inherit = GROUP_SAVE_GEOS
         [[[environment]]]
@@ -169,7 +172,8 @@
                  --startDate  ${CYCLE_F1H_DATE} \
                  --endDate    ${CYCLE_F6H_DATE} \
                  --rinc      1 \
-                 --otherArgs '-olevel 2'
+                 --otherArgs '-olevel 2' \
+                 {{SKIP_OPT_OBSOP_MEM}}
                  """
         inherit = GROUP_OBSOP
         [[[environment]]]
@@ -189,7 +193,8 @@
     [[create_letkf_dir]]
         script = """
                  echo "create_letkf_dir $CYCLE_DATE"
-                 {{CYCLE_LETKF_SRCS}}/create_letkf_dir.py {{SHARED_TMP_DIR}}/${CYCLE_DATE}_letkf
+                 {{CYCLE_LETKF_SRCS}}/create_letkf_dir.py {{SHARED_TMP_DIR}}/${CYCLE_DATE}_letkf \
+                 {{SKIP_OPT_CREATE_LETKF_DIR}}
                  """
         [[[environment]]]
 
@@ -205,7 +210,8 @@
                  --bkgdFile1 {{EXP_DIR}}/bkgd/${C4MEM}/${NEXT_CYCLE_DATE}/RESTART/MOM.res.nc \
                  --bkgdFile2 {{EXP_DIR}}/bkgd/${C4MEM}/${NEXT_CYCLE_DATE}/RESTART/MOM.res.nc \
                  --obsFile   {{EXP_DIR}}/obsbkgd/${C4MEM}/${NEXT_CYCLE_DATE}/hx_sss.dat \ 
-                 --member {{imem}}
+                 --member {{imem}} \
+                 {{SKIP_OPT_PREP_LETKF_MEM}}
 
                  """
         inherit = GROUP_PREP_LETKF
@@ -240,7 +246,8 @@
                  --analFile1Tpl anal#MEMBER#.MOM.res.nc \
                  --analFile2Tpl anal#MEMBER#.MOM.res.nc \
                  --obsFileTpl   obs01#MEMBER#.dat \
-                 --strLength 3
+                 --strLength 3 \
+                 {{SKIP_OPT_RUN_LETKF}}
                  """
 
         [[[environment]]]
@@ -262,7 +269,8 @@
                  --bkgdSprdDir {{EXP_DIR}}/bkgd/sprd/${NEXT_CYCLE_DATE} \
                  --analMeanDir {{EXP_DIR}}/anal/mean/${NEXT_CYCLE_DATE} \
                  --analSprdDir {{EXP_DIR}}/anal/sprd/${NEXT_CYCLE_DATE} \
-                 --ombDir {{EXP_DIR}}/obsbkgd/mean/${NEXT_CYCLE_DATE}
+                 --ombDir {{EXP_DIR}}/obsbkgd/mean/${NEXT_CYCLE_DATE} \
+                 {{SKIP_OPT_SAVE_LETKF_DIAG}}
                  """
         [[[environment]]]
 
@@ -277,7 +285,8 @@
                  --letkfDir {{SHARED_TMP_DIR}}/${CYCLE_DATE}_letkf \
                  --bkgdDir  {{EXP_DIR}}/bkgd/${C4MEM}/${NEXT_CYCLE_DATE}  \
                  --res 5 \
-                 --member {{imem}}
+                 --member {{imem}} \
+                 {{SKIP_OPT_SAVE_LETKF_MEM}}
                  """
         inherit = GROUP_SAVE_LETKF
         [[[environment]]]
@@ -286,4 +295,18 @@
     {% endfor %}
 
 
+    #---------------------------------------------------------------------------
+    # clean tmp dir
+    #
+    [[clean_odas_tmpdir]]
+        script = """
+                 echo "clean_tmpdir  $CYCLE_DATE"
+                 {{CYCLE_LETKF_SRCS}}/clean_odas_tmpdir.py \
+                 --letkfDir {{SHARED_TMP_DIR}}/${CYCLE_DATE}_letkf \
+                 --fcstDirTpl  {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst{:04d} \
+                 --obsopDirTpl {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst{:04d} \
+                 --ensize       {{MEMBERS}} \
+                 {{SKIP_OPT_CLEAN_TMP}}
+                 """
+ 
 
