@@ -304,7 +304,7 @@
                  {{CYCLE_LETKF_SRCS}}/clean_odas_tmpdir.py \
                  --letkfDir {{SHARED_TMP_DIR}}/${CYCLE_DATE}_letkf \
                  --fcstDirTpl  {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst{:04d} \
-                 --obsopDirTpl {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst{:04d} \
+                 --obsopDirTpl {{SHARED_TMP_DIR}}/${CYCLE_DATE}_obsop{:04d} \
                  --ensize       {{MEMBERS}} \
                  {{SKIP_OPT_CLEAN_TMP}}
                  """

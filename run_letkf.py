@@ -168,6 +168,7 @@ def parse_cmd_line():
     parser.add_argument("--analFile1Tpl", required=True,help=())
     parser.add_argument("--analFile2Tpl", required=False, default=None,help=())
     parser.add_argument("--strLength", required=False, type=int, default=3, help=())
+    parser.add_argument("--skip", action=argparse.BooleanOptionalAction,required=False, default=False)
 
     args = parser.parse_args()
 
@@ -191,7 +192,8 @@ def parse_cmd_line():
 
 if __name__ == '__main__':
     args = parse_cmd_line()
-    run_das_letkf(args.wkdir, \
+    if not args.skip:
+        run_das_letkf(args.wkdir, \
                   args.ensize, \
                   args.letkfExec, \
                   args.nprocs, \
