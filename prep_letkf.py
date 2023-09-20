@@ -67,6 +67,7 @@ def parse_cmd_line():
     parser.add_argument("--bkgdFile2", required=False, default=None,help=())
     parser.add_argument("--obsFile",required=True,help=(""))
     parser.add_argument("--member", required=True,type=int,help=("which member"))
+    parser.add_argument('--skip', action=argparse.BooleanOptionalAction,required=False, default=False)
 
     args = parser.parse_args()
 
@@ -87,7 +88,8 @@ def parse_cmd_line():
 
 if __name__ == '__main__':
     args = parse_cmd_line()
-    prep_letkf_1mem(args.wkdir, \
+    if not args.skip:
+        prep_letkf_1mem(args.wkdir, \
                     args.bkgdFile1, \
                     args.bkgdFile2, \
                     args.obsFile, \
