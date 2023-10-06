@@ -34,8 +34,8 @@
             CYCLE_F1H_DATE=$(cylc cycle-point --offset-hours=1 --template=%Y%m%dT%H)
             CYCLE_F6H_DATE=$(cylc cycle-point --offset-hours=6 --template=%Y%m%dT%H)
 
-            NEXT_CYCLE_DATE=$(cylc cycle-point --offset-hours=24 --template=%Y%m%dT%H)
-            NEXT_CYCLE_YYYY_MM_DD_HH=$(cylc cycle-point --offset-hours=24 --template=%Y_%m_%d_%H)
+            NEXT_CYCLE_DATE=$(cylc cycle-point --offset-hours={{DA_CYCLE_HRS}} --template=%Y%m%dT%H)
+            NEXT_CYCLE_YYYY_MM_DD_HH=$(cylc cycle-point --offset-hours={{DA_CYCLE_HRS}} --template=%Y_%m_%d_%H)
 
     #---------------------------------------------------------------------------
     # task group for tasks with an ensemble dimension
