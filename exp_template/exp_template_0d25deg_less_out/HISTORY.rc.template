@@ -99,8 +99,8 @@ PC720x361-DC.LM: 72
   prog.eta.grid_label:            PC720x361-DC ,
   prog.eta.regrid_method:        'BILINEAR',
   prog.eta.mode:                 'instantaneous' ,
-  prog.eta.frequency:             060000 ,
-  prog.eta.duration:              060000 ,
+  prog.eta.frequency:             030000 ,
+  prog.eta.duration:              030000 ,
   prog.eta.ref_time:              030000 ,
   prog.eta.fields:               'PHIS'       , 'AGCM'       , 'phis'       ,
                                  'SGH'        , 'AGCM'       , 'hs_stdv'    ,
@@ -120,6 +120,9 @@ PC720x361-DC.LM: 72
                                  'QLTOT'      , 'AGCM'       , 'qltot'      ,
                                  'QRTOT'      , 'MOIST'      , 'qrtot'      ,
                                  'QSTOT'      , 'MOIST'      , 'qstot'      ,
+                                 'T2M'        , 'SURFACE'    , 't2m'        ,
+                                 'Q2M'        , 'SURFACE'    , 'q2m'        ,
+                                 'U10M;V10M'  , 'SURFACE'    , 'u10m;v10m'  ,
                                   ::
 
   prog.eta_cube.template:             '%y4%m2%d2_%h2%n2z.nc4' ,
