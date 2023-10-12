@@ -99,9 +99,7 @@
 
                  umask 022
                  ulimit -s unlimited
-                 module use -a ~sakella/modulefiles
-                 module load python/17May2023
-                 ml
+                 source {{CYCLE_LETKF_SRCS}}/cylc/{{MY_NAME}}/etc/env.sh
 
                  PYTHONPATH={{CYCLE_LETKF_SRCS}} {{CYCLE_LETKF_SRCS}}/gcm_run_lib_v2.py {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst${C4MEM} \
                  --flowDir {{CYCLE_LETKF_SRCS}} \
