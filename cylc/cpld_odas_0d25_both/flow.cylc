@@ -151,8 +151,8 @@
         platform = discover
         execution time limit = PT20M
         script = """
-                 echo "run_obsop_4d {{imem}} $CYCLE_DATE"
-                 {{CYCLE_LETKF_SRCS}}/run_obsop_4d.py {{SHARED_TMP_DIR}}/${CYCLE_DATE}_obsop${C4MEM} \
+                 echo "run_obsop_4d sst_viirs {{imem}} $CYCLE_DATE"
+                 {{CYCLE_LETKF_SRCS}}/run_obsop_4d.py {{SHARED_TMP_DIR}}/${CYCLE_DATE}_sst_obsop${C4MEM} \
                  --obsopExec  {{OLETKF_EXEC_DIR}}/OCN.obsOp_mom6.sst_viirs.x \
                  --rstFile    {{EXP_DIR}}/bkgd/${C4MEM}/${NEXT_CYCLE_DATE}/RESTART/MOM.res.nc \
                  --staticFile {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst${C4MEM}/scratch/ocean_static.nc \
@@ -166,6 +166,25 @@
                  --rinc      1 \
                  --otherArgs '-binary T' \
                  {{SKIP_OPT_OBSOP_MEM}}
+
+
+                 echo "run_obsop_4d sss_smap {{imem}} $CYCLE_DATE"
+                 {{CYCLE_LETKF_SRCS}}/run_obsop_4d.py {{SHARED_TMP_DIR}}/${CYCLE_DATE}_sss_obsop${C4MEM} \
+                 --obsopExec  {{OLETKF_EXEC_DIR}}/OCN.obsOp_mom6.sss.x \
+                 --rstFile    {{EXP_DIR}}/bkgd/${C4MEM}/${NEXT_CYCLE_DATE}/RESTART/MOM.res.nc \
+                 --staticFile {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst${C4MEM}/scratch/ocean_static.nc \
+                 --topoFile   {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst${C4MEM}/scratch/INPUT/ocean_topog.nc \
+                 --nml        {{CYCLE_LETKF_SRCS}}/cylc/cpld_odas_0d25/etc/input.nml.obsop.0d25deg \
+                 --bkgdFileTpl   {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst${C4MEM}/scratch/ocean_hourly_%Y_%m_%d_%H.nc \
+                 --obsFileTpl    {{EXP_DIR}}/obs/${NEXT_CYCLE_DATE}/%Y%m%dT%H.sss.bin \
+                 --hxFile     {{EXP_DIR}}/obsbkgd/${C4MEM}/${NEXT_CYCLE_DATE}/hx_sss.dat \
+                 --startDate ${CYCLE_F1H_DATE} \
+                 --endDate   ${CYCLE_F6H_DATE} \
+                 --rinc      1 \
+                 --otherArgs '-binary T' \
+                 {{SKIP_OPT_OBSOP_MEM}}
+
+
                  """
         inherit = GROUP_OBSOP
         [[[environment]]]
@@ -290,10 +309,9 @@
     [[clean_odas_tmpdir]]
         script = """
                  echo "clean_tmpdir  $CYCLE_DATE"
-                 {{CYCLE_LETKF_SRCS}}/clean_odas_tmpdir.py \
-                 --letkfDir {{SHARED_TMP_DIR}}/${CYCLE_DATE}_letkf \
-                 --fcstDirTpl  {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst{:04d} \
-                 --obsopDirTpl {{SHARED_TMP_DIR}}/${CYCLE_DATE}_obsop{:04d} \
+                 {{CYCLE_LETKF_SRCS}}/clean_tmpdir.py \
+                 --sharedDirs {{SHARED_TMP_DIR}}/${CYCLE_DATE}_letkf \
+                 --memDirTpls  "{{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst{:04d};{{SHARED_TMP_DIR}}/${CYCLE_DATE}_sss_obsop{:04d};{{SHARED_TMP_DIR}}/${CYCLE_DATE}_sst_obsop{:04d}" \
                  --ensize       {{MEMBERS}} \
                  {{SKIP_OPT_CLEAN_TMP}}
                  """
