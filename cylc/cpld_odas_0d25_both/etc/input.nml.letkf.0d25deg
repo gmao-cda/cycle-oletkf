@@ -1,0 +1,67 @@
+&GRID_DIMENSIONS_NML
+ NLON= 1440       ,
+ NLAT= 1080       ,
+ NLEV= 75         ,
+ /
+&PARAMS_MODEL_NML
+ GRIDFILE1="MOM.res.nc",
+ !GRIDFILE1="../../mom6/obsop/MOM.res_1.nc",  ! not used
+ GRIDFILE2="ocean_topo.nc",
+ GRIDFILE3="ocean_static.nc",
+ GRID_NLON_NAME="lonh",
+ GRID_NLAT_NAME="lath",
+ GRID_NLEV_NAME="Layer",
+ GRID_LON_NAME="lonh",
+ GRID_LAT_NAME="lath",
+ GRID_LEV_NAME="Layer",
+ GRID_H_NAME="h",
+ GRID_LON2D_NAME="geolon",
+ GRID_LAT2D_NAME="geolat",
+ GRID_WET_NAME="wet",
+ GRID_DEPTH_NAME="depth",
+ 
+ DIAG_TEMP_NAME="temp",
+ DIAG_SALT_NAME="salt",
+ DIAG_U_NAME="u",
+ DIAG_V_NAME="v",
+ DIAG_H_NAME="h",
+ DIAG_SSH_NAME="ssh",
+ DIAG_SST_NAME="sst",
+ DIAG_SSS_NAME="sss",
+ DIAG_DO_TEMP = T, 
+ DIAG_DO_SALT = T, 
+ DIAG_DO_U    = T,
+ DIAG_DO_V    = T,
+ DIAG_DO_SSH  = T,
+ DIAG_DO_SSS  = T,
+ DIAG_DO_SST  = T,
+
+!rsrt_temp_name = "Temp",
+ !rsrt_salt_name = "Salt",
+ !rsrt_h_name = "h",
+ !rsrt_u_name = "u",
+ !rsrt_v_name = "v",
+ !rsrt_ssh_name = "ave_ssh",
+ rsrt_tsbase = "MOM.res.nc",
+ rsrt_uvbase = "MOM.res_1.nc", ! for V-component in res_1.nc
+ !rsrt_hbase = "",
+ /
+
+&PARAMS_OBS_NML
+ /
+
+&PARAMS_LETKF_NML
+ DO_WRITE_ENS_MEAN_SPRD = T,
+ NBV = #MEMBER#, 
+ NSLOTS = 1,
+ NBSLOT = 1, 
+ GROSS_ERROR = 5.0, 
+
+ cov_infl_mul = 1.0,
+ DO_RTPP = F,
+ rtpp_coeff = 0.8,
+ DO_RTPS = T,
+ rtps_coeff = 0.95,
+
+ DO_WRITE_OMB_MEAN = T,
+ /
