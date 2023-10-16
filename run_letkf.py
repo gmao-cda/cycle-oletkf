@@ -149,6 +149,13 @@ def run_das_letkf(wkdir="./", \
     if rc != 0:
         raise RuntimeError("command ({}) failed with return code {}".format(shell_cmd, rc))
         sys.exit(11)
+
+    # print out diagnostics
+    shell_cmd = "cat NOUT-0000"
+    print(shell_cmd)
+    rc, msgOut = run_shell_cmd(cmd=shell_cmd, wkdir=wkdir, showError=True)
+    print(msgOut)
+    print("\nreturn code={}\n".format(rc))
     
 
 

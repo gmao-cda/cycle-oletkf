@@ -42,6 +42,7 @@ def generate_output_directory(expdir=None, \
     subdirs = {'anal':    {'has_tdim':True, 'has_edim':True}, \
                'bkgd':    {'has_tdim':True, 'has_edim':True}, \
                'obsbkgd': {'has_tdim':True, 'has_edim':True}, \
+               'hist':    {'has_tdim':True, 'has_edim':True}, \
                'obs':     {'has_tdim':True, 'has_edim':False}, \
                'cfg':     {'has_tdim':False,'has_edim':False} }
 
