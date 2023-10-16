@@ -18,6 +18,7 @@
 {% set NJOBS_FOR_OBSOP = 5 %}
 {% set NJOBS_FOR_PREP_LETKF = 5 %}
 {% set NJOBS_FOR_SAVE_LETKF = 5 %}
+{% set NJOBS_FOR_SAVE_GEOSHIST = 5 %}
 
 {% set SKIP_OPT_PREP_GEOS_FCST_MEM   = "--no-skip" %}
 {% set SKIP_OPT_GEOS_FCST_MEM        = "--no-skip" %}
@@ -28,6 +29,7 @@
 {% set SKIP_OPT_RUN_LETKF            = "--no-skip" %}
 {% set SKIP_OPT_SAVE_LETKF_DIAG      = "--no-skip" %}
 {% set SKIP_OPT_SAVE_LETKF_MEM       = "--no-skip" %}
+{% set SKIP_OPT_SAVE_GEOSHIST_MEM    = "--no-skip" %}
 {% set SKIP_OPT_CLEAN_TMP            = "--no-skip" %}
 
 
