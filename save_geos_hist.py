@@ -11,7 +11,7 @@ OCN_FLIST = ["ocean_hourly_*_*_*_*.nc",\
 ATM_FLIST = ["*.geosgcm_pcp_cda.*.nc4",\
              "*.geosgcm_surf_cda.*.nc4",\
              "*.prog.eta.*.nc4",\
-             "*.geosgcm_prog.*.nc4"]
+             "*.geosgcm_prog_cda.*.nc4"]
 
 def run_shell_cmd(cmd, wkdir, showError=False):
     p = sp.Popen(cmd, cwd=wkdir, shell=True,stdout=sp.PIPE, stderr=sp.PIPE)
