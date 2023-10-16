@@ -5,17 +5,16 @@ import shutil
 #import yaml
 #import hashlib
 
-def run_shell_cmd(cmd, wkdir, showError=False):
+def run_shell_cmd(cmd, wkdir):
     p = sp.Popen(cmd, cwd=wkdir, shell=True,stdout=sp.PIPE, stderr=sp.PIPE)
     out, err = p.communicate()
-    if showError: print("ERROR_MESSAGE={}".format(err.decode()))
-    return p.returncode, out.decode()
-
+    #if showError: print("ERROR_MESSAGE={}".format(err.decode())) if p.returncode != 0 else print("NO ERROR")
+    return p.returncode, out.decode(), err.decode()
 
 def prep_letkf_1mem(wkdir = "./", \
                     bkgdFile1="./MOM.res.nc", \
                     bkgdFile2="./MOM.res_1.nc", \
-                    obsFile="./obs01001.dat", \
+                    obsFiles="./hx_sss.dat;./hx_sst.dat", \
                     member=1):
    
     if not os.path.exists(wkdir):
@@ -30,9 +29,16 @@ def prep_letkf_1mem(wkdir = "./", \
         raise RuntimeError("bgkdFile2 ({}) does not exist.".format(bkgdFile2))
         sys.exit(3)
 
-    if not os.path.isfile(obsFile):
-        raise RuntimeError("obsFile ({}) does not exist.".format(obsFile))
-        sys.exit(4)
+    tmpList = obsFiles.split(";")
+    obsFiles = []
+    for f in tmpList:
+        obsFiles.append(os.path.abspath(f))
+    print("obsFiles=",obsFiles)
+
+    for f in obsFiles:
+        if not os.path.isfile(f):
+            raise RuntimeError("obsFile ({}) does not exist.".format(f))
+            sys.exit(4)
 
     daObsFile = "obs01{:03d}.dat".format(member)
     daBkgdFile1 = "gs01{:03d}.MOM.res.nc".format(member)
@@ -47,8 +53,33 @@ def prep_letkf_1mem(wkdir = "./", \
     print("daAnalFile2=",daAnalFile2)
     
 
-    # link obsfile & bgkdFile
-    os.symlink(obsFile,   os.path.join(wkdir, daObsFile))
+    # link obsfile 
+    if os.path.exists(os.path.join(wkdir,daObsFile)):
+        daObsFileRenamed = daObsFile + dt.datetime.now().strftime("_renamed_%Y%m%dT%H%M%S")
+        os.rename(os.path.join(wkdir,daObsFile), os.path.join(wkdir,daObsFileRenamed))
+        print("obs_sim file ({}) already exists. rename it to {}.".format(daObsFile, daObsFileRenamed) )
+
+    cmd = "touch {}".format(daObsFile)
+    print(cmd)
+    rc, msg, err = run_shell_cmd(cmd=cmd, wkdir=wkdir)
+    print(msg) if rc == 0 else print(msg+"\nError:"+err)
+    if rc != 0:
+        raise RuntimeError("command ({}) failed with return code {}".format(cmd, rc))
+        sys.exit(10)
+
+    for f in obsFiles:
+        os.symlink(f,   os.path.join(wkdir, os.path.basename(f)) )
+
+        cmd = "cat {} >> {}".format(os.path.basename(f),daObsFile)
+        print(cmd)
+
+        rc, msg, err = run_shell_cmd(cmd=cmd, wkdir=wkdir)
+        print(msg) if rc == 0 else print(msg+"\nError:"+err)
+        if rc != 0:
+            raise RuntimeError("command ({}) failed with return code {}".format(cmd, rc))
+ 
+
+    # link bkgdfile
     os.symlink(bkgdFile1, os.path.join(wkdir, daBkgdFile1))
     if bkgdFile2 != bkgdFile1: 
         os.symlink(bkgdFile2, os.path.join(wkdir, daBkgdFile2))
@@ -65,7 +96,7 @@ def parse_cmd_line():
     parser.add_argument("wkdir", help=("where to run fcst"))
     parser.add_argument("--bkgdFile1", required=True, help=(""))
     parser.add_argument("--bkgdFile2", required=False, default=None,help=())
-    parser.add_argument("--obsFile",required=True,help=(""))
+    parser.add_argument("--obsFiles",required=True,help=(""))
     parser.add_argument("--member", required=True,type=int,help=("which member"))
     parser.add_argument('--skip', action=argparse.BooleanOptionalAction,required=False, default=False)
 
@@ -79,7 +110,6 @@ def parse_cmd_line():
         args.bkgdFile2 = args.bkgdFile1
     else:
         args.bkgdFile2 = os.path.abspath(args.bkgdFile2)
-    args.obsFile = os.path.abspath(args.obsFile)
 
 
     print(args)
@@ -92,6 +122,6 @@ if __name__ == '__main__':
         prep_letkf_1mem(args.wkdir, \
                     args.bkgdFile1, \
                     args.bkgdFile2, \
-                    args.obsFile, \
+                    args.obsFiles, \
                     args.member)
 

@@ -220,7 +220,7 @@
                  {{CYCLE_LETKF_SRCS}}/prep_letkf.py {{SHARED_TMP_DIR}}/${CYCLE_DATE}_letkf \
                  --bkgdFile1 {{EXP_DIR}}/bkgd/${C4MEM}/${NEXT_CYCLE_DATE}/RESTART/MOM.res.nc \
                  --bkgdFile2 {{EXP_DIR}}/bkgd/${C4MEM}/${NEXT_CYCLE_DATE}/RESTART/MOM.res_1.nc \
-                 --obsFile   {{EXP_DIR}}/obsbkgd/${C4MEM}/${NEXT_CYCLE_DATE}/hx_sst.dat \ 
+                 --obsFile   "{{EXP_DIR}}/obsbkgd/${C4MEM}/${NEXT_CYCLE_DATE}/hx_sst.dat;{{EXP_DIR}}/obsbkgd/${C4MEM}/${NEXT_CYCLE_DATE}/hx_sss.dat" \ 
                  --member {{imem}} \
                  {{SKIP_OPT_PREP_LETKF_MEM}}
 
@@ -249,7 +249,7 @@
                  --rstFile      {{EXP_DIR}}/bkgd/0001/${NEXT_CYCLE_DATE}/RESTART/MOM.res.nc \
                  --staticFile   {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst0001/scratch/ocean_static.nc \
                  --topoFile     {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst0001/scratch/INPUT/ocean_topog.nc \
-                 --nml          {{CYCLE_LETKF_SRCS}}/cylc/cpld_odas_0d25/etc/input.nml.letkf.0d25deg \
+                 --nml          {{CYCLE_LETKF_SRCS}}/cylc/{{MY_NAME}}/etc/input.nml.letkf.0d25deg \
                  --bkgdFile1Tpl gs01#MEMBER#.MOM.res.nc \
                  --bkgdFile2Tpl gs01#MEMBER#.MOM.res_1.nc \
                  --analFile1Tpl anal#MEMBER#.MOM.res.nc \
