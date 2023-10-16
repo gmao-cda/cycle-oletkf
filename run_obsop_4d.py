@@ -2,7 +2,7 @@
 
 import os, sys, glob, argparse, datetime as dt, subprocess as sp
 import shutil
-import yaml
+#import yaml
 #import hashlib
 
 def run_shell_cmd(cmd, wkdir):
