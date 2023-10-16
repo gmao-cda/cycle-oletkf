@@ -68,9 +68,9 @@ def prep_letkf_1mem(wkdir = "./", \
         sys.exit(10)
 
     for f in obsFiles:
-        os.symlink(f,   os.path.join(wkdir, os.path.basename(f)) )
+        os.symlink(f,   os.path.join(wkdir, os.path.basename(f))+".{:03}".format(member) )
 
-        cmd = "cat {} >> {}".format(os.path.basename(f),daObsFile)
+        cmd = "cat {} >> {}".format(os.path.basename(f)+".{:03}".format(member),daObsFile)
         print(cmd)
 
         rc, msg, err = run_shell_cmd(cmd=cmd, wkdir=wkdir)

@@ -6,7 +6,7 @@
 {% set FWD_EXEC = "/discover/nobackup/projects/gmao/scda_iesa/cda/GEOSgcm_08Nov2022/install/bin/GEOSgcm.x" %}
 {% set SITE = "NCCS" %}
 
-{% set OLETKF_EXEC_DIR = "/discover/nobackup/cda/projects2/viirs_sst/Ocean-LETKF/cbuild/src" %}
+{% set OLETKF_EXEC_DIR = "/discover/nobackup/cda/develop_space/develop_ocean_letkf/Ocean-LETKF-v5/cbuild_esma/src" %}
 {% set NPROCS_LETKF = 840 %}
 
 {% set HPC_GROUP_ACCOUNT = "s2647" %}
@@ -36,8 +36,8 @@
 {% set MEMBERS = 3 %}
 {% set EXP_DIR= "/discover/nobackup/cda/projects2/odas3_0d25_4d_m3" %}
 {% set SHARED_TMP_DIR= "/discover/nobackup/cda/projects2/tmp_odas3_0d25_4d_m3" %}
-{% set INITIAL_CYCLE_POINT = "2019-09-01T00Z" %}
-{% set FINAL_CYCLE_POINT = "2019-09-01T00Z" %}
+{% set INITIAL_CYCLE_POINT = "2019-10-01T00Z" %}
+{% set FINAL_CYCLE_POINT = "2019-10-02T00Z" %}
 
 {% set FCST_HRS = 6 %}
 
