@@ -6,13 +6,13 @@ EXPSRC: GEOSgcm-v10.23.0
 
 CONTACT: 'http://gmao.gsfc.nasa.gov'
 
-COLLECTIONS: 'geosgcm_prog'
+COLLECTIONS: 'geosgcm_prog_cda'
              'prog.eta'
-             'prog.eta_cube'
+#             'prog.eta_cube'
              'geosgcm_surf_cda'
              'geosgcm_pcp_cda'
-             'geosgcm_surf'
-             'geosgcm_ocn'
+#             'geosgcm_surf'
+#             'geosgcm_ocn'
 #             'geosgcm_moist'
 #             'geosgcm_turb'
 #             'geosgcm_gwd'
@@ -92,6 +92,30 @@ PC720x361-DC.LM: 72
                                  'O3'     , 'CHEMISTRY'  ,
                                   ::
 
+  geosgcm_prog_cda.template:         '%y4%m2%d2_%h2%n2z.nc4' ,
+  geosgcm_prog_cda.archive:          '%c/Y%y4' ,
+  geosgcm_prog_cda.format:           'CFIO' ,
+  geosgcm_prog_cda.deflate:           1 ,
+  geosgcm_prog_cda.grid_label:        PC720x361-DC ,
+  geosgcm_prog_cda.regrid_method:    'BILINEAR',
+  geosgcm_prog_cda.frequency:         060000 ,
+  geosgcm_prog_cda.vscale:            100.0 ,
+  geosgcm_prog_cda.vunit:            'hPa' ,
+  geosgcm_prog_cda.vvars:            'log(PLE)' , 'DYN' ,
+  geosgcm_prog_cda.levels:            1000  925  850 800 700 500 300 200 100 ,
+  geosgcm_prog.fields:           'PHIS'   , 'AGCM'       ,
+                                 'SLP'    , 'DYN'        ,
+                                 'U;V'    , 'DYN'        ,
+                                 'T'      , 'DYN'        ,
+                                 'PS'     , 'DYN'        ,
+                                 'ZLE'    , 'DYN'        , 'H'   ,
+                                 'OMEGA'  , 'DYN'        ,
+                                 'Q'      , 'MOIST'      , 'QV'  ,
+                                 'QITOT'  , 'AGCM'       , 'QI'  ,
+                                 'QLTOT'  , 'AGCM'       , 'QL'  ,
+                                 'RH2'    , 'MOIST'      , 'RH'  ,
+                                 ::
+ 
   prog.eta.template:             '%y4%m2%d2_%h2%n2z.nc4' ,
   prog.eta.archive:              '%c/Y%y4' ,
   prog.eta.format:               'CFIO' ,
@@ -99,8 +123,8 @@ PC720x361-DC.LM: 72
   prog.eta.grid_label:            PC720x361-DC ,
   prog.eta.regrid_method:        'BILINEAR',
   prog.eta.mode:                 'instantaneous' ,
-  prog.eta.frequency:             060000 ,
-  prog.eta.duration:              060000 ,
+  prog.eta.frequency:             010000 ,
+  prog.eta.duration:              010000 ,
   prog.eta.ref_time:              000000 ,
   prog.eta.fields:               'PHIS'       , 'AGCM'       , 'phis'       ,
                                  'SGH'        , 'AGCM'       , 'hs_stdv'    ,
@@ -120,6 +144,9 @@ PC720x361-DC.LM: 72
                                  'QLTOT'      , 'AGCM'       , 'qltot'      ,
                                  'QRTOT'      , 'MOIST'      , 'qrtot'      ,
                                  'QSTOT'      , 'MOIST'      , 'qstot'      ,
+                                 'T2M'        , 'SURFACE'    , 't2m'        ,
+                                 'Q2M'        , 'SURFACE'    , 'q2m'        ,
+                                 'U10M;V10M'  , 'SURFACE'    , 'u10m;v10m'  ,
                                   ::
 
   prog.eta_cube.template:             '%y4%m2%d2_%h2%n2z.nc4' ,

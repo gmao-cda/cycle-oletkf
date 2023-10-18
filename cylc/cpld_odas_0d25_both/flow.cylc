@@ -167,7 +167,7 @@
                  --startDate ${CYCLE_F1H_DATE} \
                  --endDate   ${CYCLE_F6H_DATE} \
                  --rinc      1 \
-                 --otherArgs '-binary T' \
+                 --otherArgs '-binary T -rm65N T' \
                  {{SKIP_OPT_OBSOP_MEM}}
 
 
@@ -184,7 +184,7 @@
                  --startDate ${CYCLE_F1H_DATE} \
                  --endDate   ${CYCLE_F6H_DATE} \
                  --rinc      1 \
-                 --otherArgs '-binary T' \
+                 --otherArgs '-binary T -rm65N T' \
                  {{SKIP_OPT_OBSOP_MEM}}
 
 
