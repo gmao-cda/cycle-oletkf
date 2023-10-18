@@ -32,14 +32,14 @@
 {% set SKIP_OPT_SAVE_LETKF_DIAG      = "--no-skip" %}
 {% set SKIP_OPT_SAVE_LETKF_MEM       = "--no-skip" %}
 {% set SKIP_OPT_SAVE_GEOSHIST_MEM    = "--no-skip" %}
-{% set SKIP_OPT_CLEAN_TMP            = "--skip" %}
+{% set SKIP_OPT_CLEAN_TMP            = "--no-skip" %}
 
 
 {% set MEMBERS = 3 %}
 {% set EXP_DIR="/discover/nobackup/cda/projects2/odas3_queue2" %}
 {% set SHARED_TMP_DIR="/discover/nobackup/cda/projects2/tmp_queue2" %}
-{% set INITIAL_CYCLE_POINT = "2019-10-01T00Z" %}
-{% set FINAL_CYCLE_POINT = "2019-10-01T06Z" %}
+{% set INITIAL_CYCLE_POINT = "2019-10-01T12Z" %}
+{% set FINAL_CYCLE_POINT = "2019-10-01T12Z" %}
 
 {% set FCST_HRS = 6 %}
 
