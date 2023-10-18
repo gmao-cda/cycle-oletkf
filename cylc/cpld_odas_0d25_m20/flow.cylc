@@ -96,7 +96,7 @@
     {% for imem in range(1,MEMBERS+1) %}
     [[geos_fcst_{{imem}}]]
         platform = discover
-        execution time limit = PT20M
+        execution time limit = PT25M
         script = """
                  echo "geos_fcst {{imem}} $CYCLE_DATE"
 
@@ -152,7 +152,7 @@
     {% for imem in range(1,MEMBERS+1) %}
     [[run_obsop_{{imem}}]]
         platform = discover
-        execution time limit = PT20M
+        execution time limit = PT30M
         script = """
                  echo "run_obsop_4d sst_viirs {{imem}} $CYCLE_DATE"
                  {{CYCLE_LETKF_SRCS}}/run_obsop_4d.py {{SHARED_TMP_DIR}}/${CYCLE_DATE}_sst_obsop${C4MEM} \
@@ -242,7 +242,7 @@
     #
     [[run_letkf]]
         platform = discover
-        execution time limit = PT25M
+        execution time limit = PT30M
         script = """
                  echo "run_letkf $CYCLE_DATE"
                  PYTHONPATH={{CYCLE_LETKF_SRCS}} {{CYCLE_LETKF_SRCS}}/run_letkf.py {{SHARED_TMP_DIR}}/${CYCLE_DATE}_letkf \

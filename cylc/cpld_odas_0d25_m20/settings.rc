@@ -1,4 +1,4 @@
-{% set MY_NAME = "cpld_odas_0d25_both" %}
+{% set MY_NAME = "cpld_odas_0d25_m20" %}
 
 {% set CYCLE_LETKF_SRCS = "/discover/nobackup/cda/develop_space/cycle-oletkf" %}
 
@@ -33,11 +33,11 @@
 {% set SKIP_OPT_CLEAN_TMP            = "--no-skip" %}
 
 
-{% set MEMBERS = 3 %}
-{% set EXP_DIR= "/discover/nobackup/cda/projects2/odas3_0d25_4d_m3" %}
-{% set SHARED_TMP_DIR= "/discover/nobackup/cda/projects2/tmp_odas3_0d25_4d_m3" %}
+{% set MEMBERS = 20 %}
+{% set EXP_DIR= "/discover/nobackup/projects/gmao/scda_iesa/cda/formal_exp/L2SSTSSS_m20" %}
+{% set SHARED_TMP_DIR= "/discover/nobackup/projects/gmao/scda_iesa/cda/formal_exp/tmp_L2SSTSSS_m20" %}
 {% set INITIAL_CYCLE_POINT = "2019-10-01T00Z" %}
-{% set FINAL_CYCLE_POINT = "2019-10-02T00Z" %}
+{% set FINAL_CYCLE_POINT = "2019-10-01T06Z" %}
 
 {% set FCST_HRS = 6 %}
 
