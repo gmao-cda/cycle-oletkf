@@ -1,0 +1,340 @@
+#!jinja2
+%include settings.rc
+
+[scheduler]
+    UTC mode = True
+[scheduling]
+    initial cycle point = {{INITIAL_CYCLE_POINT}}
+    final cycle point = {{FINAL_CYCLE_POINT}}
+    [[graph]]
+        PT6H = """
+            {% for imem in range(1,MEMBERS+1) %}
+            prep_geos_fcst_{{imem}} => geos_fcst_{{imem}} => save_fcst_{{imem}} 
+
+            save_fcst_{{imem}} => run_obsop_{{imem}} => create_letkf_dir => prep_letkf_{{imem}} => run_letkf 
+
+            run_letkf => save_letkf_{{imem}} => save_geoshist_{{imem}} => save_letkf_diag => clean_odas_tmpdir
+            {% endfor %}
+                """
+        +PT6H/PT6H = """
+            {% for imem in range(1,MEMBERS+1) %}
+            clean_odas_tmpdir[-PT6H] => prep_geos_fcst_{{imem}}
+            {% endfor %}
+
+                    """
+    [[queues]]
+       [[[prep_geos_queue]]]
+          limit = {{NJOBS_FOR_PREP_GEOS}}
+          members = GROUP_PREP_GEOS
+       [[[fcst_geos_queue]]]
+          limit = {{NJOBS_FOR_FCST_GEOS}}
+          members = GROUP_FCST_GEOS
+       [[[save_geos_queue]]]
+          limit = {{NJOBS_FOR_SAVE_GEOS}}
+          members = GROUP_SAVE_GEOS
+       [[[obsop_queue]]]
+          limit = {{NJOBS_FOR_OBSOP}}
+          members = GROUP_OBSOP
+       [[[prep_letkf_queue]]]
+          limit = {{NJOBS_FOR_PREP_LETKF}}
+          members = GROUP_PREP_LETKF
+       [[[save_letkf_queue]]]
+          limit = {{NJOBS_FOR_SAVE_LETKF}}
+          members = GROUP_SAVE_LETKF
+       [[[save_geoshist_queue]]]
+          limit = {{NJOBS_FOR_SAVE_GEOSHIST}}
+          members = GROUP_SAVE_GEOSHIST
+[runtime]
+    #---------------------------------------------------------------------------
+    # env shared by all tasks
+    #
+    [[root]]
+        [[[environment]]]
+            CYCLE_DATE=$(cylc cycle-point --template=%Y%m%dT%H)
+            CYCLE_F1H_DATE=$(cylc cycle-point --offset-hours=1 --template=%Y%m%dT%H)
+            CYCLE_F6H_DATE=$(cylc cycle-point --offset-hours=6 --template=%Y%m%dT%H)
+
+            NEXT_CYCLE_DATE=$(cylc cycle-point --offset-hours=6 --template=%Y%m%dT%H)
+            NEXT_CYCLE_YYYY_MM_DD_HH=$(cylc cycle-point --offset-hours=6 --template=%Y_%m_%d_%H)
+
+    #---------------------------------------------------------------------------
+    # task group for tasks with an ensemble dimension
+    #
+    [[GROUP_PREP_GEOS]]
+    [[GROUP_FCST_GEOS]]
+    [[GROUP_SAVE_GEOS]]
+    [[GROUP_OBSOP]]
+    [[GROUP_PREP_LETKF]]
+    [[GROUP_SAVE_LETKF]]
+    [[GROUP_SAVE_GEOSHIST]]
+
+    #---------------------------------------------------------------------------
+    # prepare exp dir
+    #
+    {% for imem in range(1,MEMBERS+1) %}
+    [[prep_geos_fcst_{{imem}}]]
+        script = """
+                 echo "prep_geos_fcst ${C4MEM} $CYCLE_DATE"
+                 {{CYCLE_LETKF_SRCS}}/prep_geos_fcst_relax.py {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst${C4MEM} \
+                 --expTplDir {{CYCLE_LETKF_SRCS}}/exp_template/exp_template_0d25deg_relax  \
+                 --cycleBkgdDir {{EXP_DIR}}/bkgd/${C4MEM}/${CYCLE_DATE} \
+                 --cycleAnalDir {{EXP_DIR}}/anal/${C4MEM}/${CYCLE_DATE} \
+                 --fwdExec {{FWD_EXEC}} \
+                 --fcstStartDate ${CYCLE_DATE} \
+                 --fcstHrs {{FCST_HRS}} \
+                 {{SKIP_OPT_PREP_GEOS_FCST_MEM}}
+                 """
+        inherit = GROUP_PREP_GEOS
+        [[[environment]]]
+            C4MEM=$(printf "%4.4d" {{imem}})
+
+    {% endfor %}
+
+    #---------------------------------------------------------------------------
+    # forecast job
+    #
+    {% for imem in range(1,MEMBERS+1) %}
+    [[geos_fcst_{{imem}}]]
+        platform = discover
+        execution time limit = PT22M
+        script = """
+                 echo "geos_fcst {{imem}} $CYCLE_DATE"
+
+                 umask 022
+                 ulimit -s unlimited
+                 source {{CYCLE_LETKF_SRCS}}/cylc/{{MY_NAME}}/etc/env.sh
+
+                 PYTHONPATH={{CYCLE_LETKF_SRCS}} {{CYCLE_LETKF_SRCS}}/gcm_run_lib_v2_relax.py {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst${C4MEM} \
+                 --flowDir {{CYCLE_LETKF_SRCS}} \
+                 --geosDir {{GEOS_DIR}} \
+                 --site {{SITE}} \
+                 --ncpus 1215 \
+                 --ncpusPerNode 45 \
+                 --bkgdSaveDir {{EXP_DIR}}/bkgd/${C4MEM}/${NEXT_CYCLE_DATE} \
+                 {{SKIP_OPT_GEOS_FCST_MEM}}
+
+                 echo "{{EXP_DIR}}/bkgd/${C4MEM}/${NEXT_CYCLE_DATE}"
+                 """
+        inherit = GROUP_FCST_GEOS
+        [[[environment]]]
+            C4MEM=$(printf "%4.4d" {{imem}})
+
+        [[[directives]]]
+            --nodes = 27
+            --ntasks-per-node = 45
+            --constraint = cas
+            --account = {{HPC_GROUP_ACCOUNT}}
+            --qos = {{HPC_QOS}}
+
+    {% endfor %}
+     
+    #---------------------------------------------------------------------------
+    # save geos fcst
+    #
+    {% for imem in range(1,MEMBERS+1) %}
+    [[save_fcst_{{imem}}]]
+        script = """
+                 echo "save_geos_fcst ${C4MEM} $CYCLE_DATE"
+                 {{CYCLE_LETKF_SRCS}}/save_geos_fcst.py {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst${C4MEM}/scratch \
+                 {{EXP_DIR}}/bkgd/${C4MEM}/${NEXT_CYCLE_DATE} \
+                 {{SKIP_OPT_SAVE_FCST_MEM}}
+                 """
+        inherit = GROUP_SAVE_GEOS
+        [[[environment]]]
+            C4MEM=$(printf "%4.4d" {{imem}})
+
+    {% endfor %}
+
+
+    #---------------------------------------------------------------------------
+    # run obsop
+    #
+    {% for imem in range(1,MEMBERS+1) %}
+    [[run_obsop_{{imem}}]]
+        platform = discover
+        execution time limit = PT20M
+        script = """
+                 echo "run_obsop_4d sst_viirs {{imem}} $CYCLE_DATE"
+                 {{CYCLE_LETKF_SRCS}}/run_obsop_4d.py {{SHARED_TMP_DIR}}/${CYCLE_DATE}_sst_obsop${C4MEM} \
+                 --obsopExec  {{OLETKF_EXEC_DIR}}/OCN.obsOp_mom6.sst_viirs.x \
+                 --rstFile    {{EXP_DIR}}/bkgd/${C4MEM}/${NEXT_CYCLE_DATE}/RESTART/MOM.res.nc \
+                 --staticFile {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst${C4MEM}/scratch/ocean_static.nc \
+                 --topoFile   {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst${C4MEM}/scratch/INPUT/ocean_topog.nc \
+                 --nml        {{CYCLE_LETKF_SRCS}}/cylc/{{MY_NAME}}/etc/input.nml.obsop.0d25deg \
+                 --bkgdFileTpl   {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst${C4MEM}/scratch/ocean_hourly_%Y_%m_%d_%H.nc \
+                 --obsFileTpl    {{EXP_DIR}}/obs/${NEXT_CYCLE_DATE}/%Y%m%dT%H.sst.bin \
+                 --hxFile     {{EXP_DIR}}/obsbkgd/${C4MEM}/${NEXT_CYCLE_DATE}/hx_sst.dat \
+                 --startDate ${CYCLE_F1H_DATE} \
+                 --endDate   ${CYCLE_F6H_DATE} \
+                 --rinc      1 \
+                 --otherArgs '-binary T -rm65N T' \
+                 {{SKIP_OPT_OBSOP_MEM}}
+
+
+                 echo "run_obsop_4d sss_smap {{imem}} $CYCLE_DATE"
+                 {{CYCLE_LETKF_SRCS}}/run_obsop_4d.py {{SHARED_TMP_DIR}}/${CYCLE_DATE}_sss_obsop${C4MEM} \
+                 --obsopExec  {{OLETKF_EXEC_DIR}}/OCN.obsOp_mom6.sss.x \
+                 --rstFile    {{EXP_DIR}}/bkgd/${C4MEM}/${NEXT_CYCLE_DATE}/RESTART/MOM.res.nc \
+                 --staticFile {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst${C4MEM}/scratch/ocean_static.nc \
+                 --topoFile   {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst${C4MEM}/scratch/INPUT/ocean_topog.nc \
+                 --nml        {{CYCLE_LETKF_SRCS}}/cylc/{{MY_NAME}}/etc/input.nml.obsop.0d25deg \
+                 --bkgdFileTpl   {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst${C4MEM}/scratch/ocean_hourly_%Y_%m_%d_%H.nc \
+                 --obsFileTpl    {{EXP_DIR}}/obs/${NEXT_CYCLE_DATE}/%Y%m%dT%H.sss.bin \
+                 --hxFile     {{EXP_DIR}}/obsbkgd/${C4MEM}/${NEXT_CYCLE_DATE}/hx_sss.dat \
+                 --startDate ${CYCLE_F1H_DATE} \
+                 --endDate   ${CYCLE_F6H_DATE} \
+                 --rinc      1 \
+                 --otherArgs '-binary T -rm65N T' \
+                 {{SKIP_OPT_OBSOP_MEM}}
+
+
+                 """
+        inherit = GROUP_OBSOP
+        [[[environment]]]
+            C4MEM=$(printf "%4.4d" {{imem}})
+
+        [[[directives]]]
+            --nodes = 1
+            --constraint = "[cas|sky]"
+            --account = {{HPC_GROUP_ACCOUNT}}
+            --qos = {{HPC_QOS}}
+ 
+    {% endfor %}
+
+    #---------------------------------------------------------------------------
+    # create letkf dir
+    #
+    [[create_letkf_dir]]
+        script = """
+                 echo "create_letkf_dir $CYCLE_DATE"
+                 {{CYCLE_LETKF_SRCS}}/create_letkf_dir.py {{SHARED_TMP_DIR}}/${CYCLE_DATE}_letkf \
+                 {{SKIP_OPT_CREATE_LETKF_DIR}}
+                 """
+        [[[environment]]]
+
+
+    #---------------------------------------------------------------------------
+    # prepare bgkd/obs/anal for letkf members
+    #
+    {% for imem in range(1,MEMBERS+1) %}
+    [[prep_letkf_{{imem}}]]
+        script = """
+                 echo "prep_letkf {{imem}} $CYCLE_DATE"
+                 {{CYCLE_LETKF_SRCS}}/prep_letkf.py {{SHARED_TMP_DIR}}/${CYCLE_DATE}_letkf \
+                 --bkgdFile1 {{EXP_DIR}}/bkgd/${C4MEM}/${NEXT_CYCLE_DATE}/RESTART/MOM.res.nc \
+                 --bkgdFile2 {{EXP_DIR}}/bkgd/${C4MEM}/${NEXT_CYCLE_DATE}/RESTART/MOM.res_1.nc \
+                 --obsFile   "{{EXP_DIR}}/obsbkgd/${C4MEM}/${NEXT_CYCLE_DATE}/hx_sst.dat;{{EXP_DIR}}/obsbkgd/${C4MEM}/${NEXT_CYCLE_DATE}/hx_sss.dat" \ 
+                 --member {{imem}} \
+                 {{SKIP_OPT_PREP_LETKF_MEM}}
+
+                 """
+        inherit = GROUP_PREP_LETKF
+        [[[environment]]]
+        CYCLE_DATE=$(cylc cycle-point --template=%Y%m%dT%H)
+        NEXT_CYCLE_DATE=$(cylc cycle-point --offset-hours=6 --template=%Y%m%dT%H)
+        C4MEM=$(printf "%4.4d" {{imem}})
+
+ 
+    {% endfor %}
+
+    #---------------------------------------------------------------------------
+    # run letkf
+    #
+    [[run_letkf]]
+        platform = discover
+        execution time limit = PT1M
+        script = """
+                 echo "run_letkf $CYCLE_DATE"
+                 PYTHONPATH={{CYCLE_LETKF_SRCS}} {{CYCLE_LETKF_SRCS}}/run_letkf.py {{SHARED_TMP_DIR}}/${CYCLE_DATE}_letkf \
+                 --ensize       {{MEMBERS}} \
+                 --letkfExec    {{OLETKF_EXEC_DIR}}/OCN.letkf_mom6.x \
+                 --nprocs       {{NPROCS_LETKF}} \
+                 --rstFile      {{EXP_DIR}}/bkgd/0001/${NEXT_CYCLE_DATE}/RESTART/MOM.res.nc \
+                 --staticFile   {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst0001/scratch/ocean_static.nc \
+                 --topoFile     {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst0001/scratch/INPUT/ocean_topog.nc \
+                 --nml          {{CYCLE_LETKF_SRCS}}/cylc/{{MY_NAME}}/etc/input.nml.letkf.0d25deg \
+                 --bkgdFile1Tpl gs01#MEMBER#.MOM.res.nc \
+                 --bkgdFile2Tpl gs01#MEMBER#.MOM.res_1.nc \
+                 --analFile1Tpl anal#MEMBER#.MOM.res.nc \
+                 --analFile2Tpl anal#MEMBER#.MOM.res_1.nc \
+                 --obsFileTpl   obs01#MEMBER#.dat \
+                 --strLength 3 \
+                 {{SKIP_OPT_RUN_LETKF}}
+                 """
+
+        [[[environment]]]
+
+        [[[directives]]]
+            --nodes = 1
+            --constraint = cas
+            --account = {{HPC_GROUP_ACCOUNT}}
+            --qos = {{HPC_QOS}}
+
+    #---------------------------------------------------------------------------
+    # save letkf diag: save ensemble mean, sprd & ombmean
+    #
+    [[save_letkf_diag]]
+        script = """
+                 echo "save_letkf_diag  $CYCLE_DATE"
+                 {{CYCLE_LETKF_SRCS}}/save_letkf_diag.py {{SHARED_TMP_DIR}}/${CYCLE_DATE}_letkf \
+                 --bkgdMeanDir {{EXP_DIR}}/bkgd/mean/${NEXT_CYCLE_DATE} \
+                 --bkgdSprdDir {{EXP_DIR}}/bkgd/sprd/${NEXT_CYCLE_DATE} \
+                 --analMeanDir {{EXP_DIR}}/anal/mean/${NEXT_CYCLE_DATE} \
+                 --analSprdDir {{EXP_DIR}}/anal/sprd/${NEXT_CYCLE_DATE} \
+                 --ombDir {{EXP_DIR}}/obsbkgd/mean/${NEXT_CYCLE_DATE} \
+                 {{SKIP_OPT_SAVE_LETKF_DIAG}}
+                 """
+        [[[environment]]]
+
+    #---------------------------------------------------------------------------
+    # save letkf mem
+    #
+    {% for imem in range(1,MEMBERS+1) %}
+    [[save_letkf_{{imem}}]]
+        script = """
+                 echo "save_letkf_mem ${C4MEM} $CYCLE_DATE"
+                 {{CYCLE_LETKF_SRCS}}/save_letkf_mem.py {{EXP_DIR}}/anal/${C4MEM}/${NEXT_CYCLE_DATE} \
+                 --letkfDir {{SHARED_TMP_DIR}}/${CYCLE_DATE}_letkf \
+                 --bkgdDir  {{EXP_DIR}}/bkgd/${C4MEM}/${NEXT_CYCLE_DATE}  \
+                 --res 0d25 \
+                 --member {{imem}} \
+                 {{SKIP_OPT_SAVE_LETKF_MEM}}
+                 """
+        inherit = GROUP_SAVE_LETKF
+        [[[environment]]]
+            C4MEM=$(printf "%4.4d" {{imem}})
+
+    {% endfor %}
+
+    #---------------------------------------------------------------------------
+    # save geos hist
+    #
+    {% for imem in range(1,MEMBERS+1) %}
+    [[save_geoshist_{{imem}}]]
+        script = """
+                 echo "save_geoshist ${C4MEM} $CYCLE_DATE"
+                 {{CYCLE_LETKF_SRCS}}/save_geos_hist.py \
+                 --srcDir {{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst${C4MEM}/scratch \
+                 --dstDir {{EXP_DIR}}/hist/${C4MEM}/${NEXT_CYCLE_DATE} \
+                 {{SKIP_OPT_SAVE_GEOSHIST_MEM}}
+                 """
+        inherit = GROUP_SAVE_GEOSHIST
+        [[[environment]]]
+            C4MEM=$(printf "%4.4d" {{imem}})
+
+    {% endfor %}
+
+
+    #---------------------------------------------------------------------------
+    # clean tmp dir
+    #
+    [[clean_odas_tmpdir]]
+        script = """
+                 echo "clean_tmpdir  $CYCLE_DATE"
+                 {{CYCLE_LETKF_SRCS}}/clean_tmpdir.py \
+                 --sharedDirs {{SHARED_TMP_DIR}}/${CYCLE_DATE}_letkf \
+                 --memDirTpls  "{{SHARED_TMP_DIR}}/${CYCLE_DATE}_fcst{:04d};{{SHARED_TMP_DIR}}/${CYCLE_DATE}_sss_obsop{:04d};{{SHARED_TMP_DIR}}/${CYCLE_DATE}_sst_obsop{:04d}" \
+                 --ensize       {{MEMBERS}} \
+                 {{SKIP_OPT_CLEAN_TMP}}
+                 """
+

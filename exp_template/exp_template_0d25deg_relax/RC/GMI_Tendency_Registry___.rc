@@ -1,0 +1,76 @@
+  COMP_NAME: GMICHEM
+  MAPL_REGISTRY_VERSION: 1.00
+<ExportSpec name="GMICHEM", cols="short_name,units,dims,vlocation,stat,refresh_interval,averaging_interval,num_subtiles,long_name">
+  AOADAYS_GMITEND        |  days s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_AOADAYS
+  CH2O_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_CH2O
+  CH4_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_CH4
+  CO_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_CO
+  H2_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_H2
+  HCOOH_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_HCOOH
+  HNO2_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_HNO2
+  HNO3_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_HNO3
+  HNO4_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_HNO4
+  HO2_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_HO2
+  H2O2_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_H2O2
+  MOH_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_MOH
+  MP_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_MP
+  N2O_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_N2O
+  NO_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_NO
+  NO2_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_NO2
+  NO3_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_NO3
+  N2O5_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_N2O5
+  OX_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_OX
+  OH_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_OH
+  Br_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_Br
+  BrCl_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_BrCl
+  BrO_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_BrO
+  BrONO2_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_BrONO2
+  HBr_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_HBr
+  HOBr_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_HOBr
+  Cl_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_Cl
+  Cl2_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_Cl2
+  ClO_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_ClO
+  Cl2O2_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_Cl2O2
+  ClONO2_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_ClONO2
+  HCl_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_HCl
+  HOCl_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_HOCl
+  OClO_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_OClO
+  CH3Br_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_CH3Br
+  CH3Cl_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_CH3Cl
+  CH3CCl3_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_CH3CCl3
+  CCl4_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_CCl4
+  CFC11_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_CFC11
+  CFC12_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_CFC12
+  CFC113_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_CFC113
+  CFC114_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_CFC114
+  CFC115_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_CFC115
+  HCFC22_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_HCFC22
+  HCFC141b_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_HCFC141b
+  HCFC142b_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_HCFC142b
+  CF2Br2_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_CF2Br2
+  CF2ClBr_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_CF2ClBr
+  CF3Br_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_CF3Br
+  H2402_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_H2402
+  ACTA_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_ACTA
+  ALD2_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_ALD2
+  ALK4_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_ALK4
+  C2H6_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_C2H6
+  C3H8_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_C3H8
+  ETP_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_ETP
+  HAC_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_HAC
+  IALD_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_IALD
+  IAP_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_IAP
+  ISOP_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_ISOP
+  MACR_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_MACR
+  MEK_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_MEK
+  MVK_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_MVK
+  PAN_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_PAN
+  PMN_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_PMN
+  PPN_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_PPN
+  PRPE_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_PRPE
+  R4N2_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_R4N2
+  RCHO_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_RCHO
+  RCOOH_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_RCOOH
+  N2_GMITEND        |  cm^-3 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_N2
+  HNO3COND_GMITEND        |  mol mol-1 s-1  | xyz | C |    |   |   |     | chemistry_rate_of_change_HNO3COND
+</ExportSpec>

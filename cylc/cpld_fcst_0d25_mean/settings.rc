@@ -1,0 +1,34 @@
+{% set MY_NAME = "cpld_fcst_0d25_mean" %}
+
+{% set CYCLE_LETKF_SRCS = "/discover/nobackup/cda/develop_space/cycle-oletkf" %}
+
+{% set GEOS_DIR = "/discover/nobackup/projects/gmao/scda_iesa/cda/GEOSgcm_08Nov2022/install" %}
+{% set FWD_EXEC = "/discover/nobackup/projects/gmao/scda_iesa/cda/GEOSgcm_08Nov2022/install/bin/GEOSgcm.x" %}
+{% set SITE = "NCCS" %}
+
+
+{% set HPC_GROUP_ACCOUNT = "s2647" %}
+{% set HPC_QOS_FAST     = "allnccs" %}
+{% set HPC_QOS_NORMAL   = "allnccs" %}
+
+{% set NJOBS_FOR_PREP_GEOS          = 5 %}
+{% set NJOBS_FOR_FCST_GEOS          = 5 %}
+{% set NJOBS_FOR_SAVE_GEOS          = 5 %}
+
+{% set SKIP_OPT_PREP_GEOS_FCST_MEM      = "--no-skip" %}
+{% set SKIP_OPT_GEOS_FCST_MEM           = "--no-skip" %}
+{% set SKIP_OPT_SAVE_FCST_MEM           = "--no-skip" %}
+
+
+{% set MEMBERS = 1 %}
+
+{% set EXP_DIR= "/discover/nobackup/projects/gmao/scda_iesa/cda/formal_exp/gen_init_mean" %}
+{% set SHARED_TMP_DIR= "/discover/nobackup/projects/gmao/scda_iesa/cda/formal_exp/tmp_gen_init_mean" %}
+
+{% set INITIAL_CYCLE_POINT = "2019-09-30T21Z" %}
+{% set FINAL_CYCLE_POINT = "2019-09-30T21Z" %}
+
+{% set DA_CYCLE_HRS = 3 %}
+{% set FCST_HRS = 3 %}
+
+

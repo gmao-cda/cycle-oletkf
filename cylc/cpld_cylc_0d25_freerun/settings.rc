@@ -1,0 +1,44 @@
+{% set MY_NAME = "cpld_cylc_0d25_freerun" %}
+
+{% set CYCLE_LETKF_SRCS = "/discover/nobackup/cda/develop_space/cycle-oletkf" %}
+
+{% set GEOS_DIR = "/discover/nobackup/projects/gmao/scda_iesa/cda/GEOSgcm_08Nov2022/install" %}
+{% set FWD_EXEC = "/discover/nobackup/projects/gmao/scda_iesa/cda/GEOSgcm_08Nov2022/install/bin/GEOSgcm.x" %}
+{% set SITE = "NCCS" %}
+
+{% set OLETKF_EXEC_DIR = "/discover/nobackup/cda/develop_space/develop_ocean_letkf/Ocean-LETKF-v5/cbuild_esma/src" %}
+{% set NPROCS_LETKF = 840 %}
+
+{% set HPC_GROUP_ACCOUNT = "s2647" %}
+{% set HPC_QOS = "allnccs" %}
+
+{% set NJOBS_FOR_PREP_GEOS = 5 %}
+{% set NJOBS_FOR_FCST_GEOS = 4 %}
+{% set NJOBS_FOR_SAVE_GEOS = 5 %}
+{% set NJOBS_FOR_OBSOP = 5 %}
+{% set NJOBS_FOR_PREP_LETKF = 5 %}
+{% set NJOBS_FOR_SAVE_LETKF = 5 %}
+{% set NJOBS_FOR_SAVE_GEOSHIST = 5 %}
+
+{% set SKIP_OPT_PREP_GEOS_FCST_MEM   = "--no-skip" %}
+{% set SKIP_OPT_GEOS_FCST_MEM        = "--no-skip" %}
+{% set SKIP_OPT_SAVE_FCST_MEM        = "--no-skip" %}
+{% set SKIP_OPT_OBSOP_MEM            = "--no-skip" %}
+{% set SKIP_OPT_CREATE_LETKF_DIR     = "--no-skip" %}
+{% set SKIP_OPT_PREP_LETKF_MEM       = "--no-skip" %}
+{% set SKIP_OPT_RUN_LETKF            = "--skip" %}
+{% set SKIP_OPT_SAVE_LETKF_DIAG      = "--skip" %}
+{% set SKIP_OPT_SAVE_LETKF_MEM       = "--no-skip" %}
+{% set SKIP_OPT_SAVE_GEOSHIST_MEM    = "--no-skip" %}
+{% set SKIP_OPT_CLEAN_TMP            = "--no-skip" %}
+
+
+{% set MEMBERS = 1 %}
+{% set EXP_DIR= "/discover/nobackup/projects/gmao/scda_iesa/cda/formal_exp/freerun" %}
+{% set SHARED_TMP_DIR= "/discover/nobackup/projects/gmao/scda_iesa/cda/formal_exp/tmp_freerun" %}
+{% set INITIAL_CYCLE_POINT = "2019-10-20T00Z" %}
+{% set FINAL_CYCLE_POINT = "2019-10-31T18Z" %}
+
+{% set FCST_HRS = 6 %}
+
+
