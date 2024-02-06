@@ -36,8 +36,8 @@
 {% set MEMBERS = 20 %}
 {% set EXP_DIR= "/discover/nobackup/projects/gmao/scda_iesa/cda/formal_exp/L2SSTSSS_m20_qc60NSv2" %}
 {% set SHARED_TMP_DIR= "/discover/nobackup/projects/gmao/scda_iesa/cda/formal_exp/tmp_L2SSTSSS_m20_qc60NSv2" %}
-{% set INITIAL_CYCLE_POINT = "2019-10-01T00Z" %}
-{% set FINAL_CYCLE_POINT = "2019-10-05T00Z" %}
+{% set INITIAL_CYCLE_POINT = "2019-10-26T06Z" %}
+{% set FINAL_CYCLE_POINT = "2019-10-31T18Z" %}
 
 {% set FCST_HRS = 6 %}
 

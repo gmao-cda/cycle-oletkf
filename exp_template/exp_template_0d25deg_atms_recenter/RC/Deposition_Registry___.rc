@@ -1,0 +1,90 @@
+  COMP_NAME: GMICHEM
+  MAPL_REGISTRY_VERSION: 1.00
+<ExportSpec name="GMICHEM", cols="short_name,units,dims,vlocation,stat,refresh_interval,averaging_interval,num_subtiles,long_name">
+  SCAV_CH2O         | kg m-3 s-1     | xyz | C |    |   |   |     | scavenging_of_CH2O
+  SCAV_HCOOH        | kg m-3 s-1     | xyz | C |    |   |   |     | scavenging_of_HCOOH
+  SCAV_HNO2         | kg m-3 s-1     | xyz | C |    |   |   |     | scavenging_of_HNO2
+  SCAV_HNO3         | kg m-3 s-1     | xyz | C |    |   |   |     | scavenging_of_HNO3
+  SCAV_HNO4         | kg m-3 s-1     | xyz | C |    |   |   |     | scavenging_of_HNO4
+  SCAV_HO2          | kg m-3 s-1     | xyz | C |    |   |   |     | scavenging_of_HO2
+  SCAV_H2O2         | kg m-3 s-1     | xyz | C |    |   |   |     | scavenging_of_H2O2
+  SCAV_MP           | kg m-3 s-1     | xyz | C |    |   |   |     | scavenging_of_MP
+  SCAV_NO3          | kg m-3 s-1     | xyz | C |    |   |   |     | scavenging_of_NO3
+  SCAV_OX           | kg m-3 s-1     | xyz | C |    |   |   |     | scavenging_of_OX
+  SCAV_BR           | kg m-3 s-1     | xyz | C |    |   |   |     | scavenging_of_BR
+  SCAV_BRCL         | kg m-3 s-1     | xyz | C |    |   |   |     | scavenging_of_BRCL
+  SCAV_HBR          | kg m-3 s-1     | xyz | C |    |   |   |     | scavenging_of_HBR
+  SCAV_HOBR         | kg m-3 s-1     | xyz | C |    |   |   |     | scavenging_of_HOBR
+  SCAV_CLO          | kg m-3 s-1     | xyz | C |    |   |   |     | scavenging_of_CLO
+  SCAV_CLONO2       | kg m-3 s-1     | xyz | C |    |   |   |     | scavenging_of_CLONO2
+  SCAV_HCL          | kg m-3 s-1     | xyz | C |    |   |   |     | scavenging_of_HCL
+  SCAV_HOCL         | kg m-3 s-1     | xyz | C |    |   |   |     | scavenging_of_HOCL
+  SCAV_ACTA         | kg m-3 s-1     | xyz | C |    |   |   |     | scavenging_of_ACTA
+  SCAV_EOH          | kg m-3 s-1     | xyz | C |    |   |   |     | scavenging_of_EOH
+  SCAV_GLYC         | kg m-3 s-1     | xyz | C |    |   |   |     | scavenging_of_GLYC
+  SCAV_GLYX         | kg m-3 s-1     | xyz | C |    |   |   |     | scavenging_of_GLYX
+  SCAV_MAP          | kg m-3 s-1     | xyz | C |    |   |   |     | scavenging_of_MAP
+  SCAV_MGLY         | kg m-3 s-1     | xyz | C |    |   |   |     | scavenging_of_MGLY
+  SCAV_RIP          | kg m-3 s-1     | xyz | C |    |   |   |     | scavenging_of_RIP
+  DD_CH2O           | kg m-2 s-1     | xy  |   |    |   |   |     | dry_deposition_of_CH2O
+  DD_HCOOH          | kg m-2 s-1     | xy  |   |    |   |   |     | dry_deposition_of_HCOOH
+  DD_HNO2           | kg m-2 s-1     | xy  |   |    |   |   |     | dry_deposition_of_HNO2
+  DD_HNO3           | kg m-2 s-1     | xy  |   |    |   |   |     | dry_deposition_of_HNO3
+  DD_HNO4           | kg m-2 s-1     | xy  |   |    |   |   |     | dry_deposition_of_HNO4
+  DD_HO2            | kg m-2 s-1     | xy  |   |    |   |   |     | dry_deposition_of_HO2
+  DD_H2O2           | kg m-2 s-1     | xy  |   |    |   |   |     | dry_deposition_of_H2O2
+  DD_MP             | kg m-2 s-1     | xy  |   |    |   |   |     | dry_deposition_of_MP
+  DD_NO2            | kg m-2 s-1     | xy  |   |    |   |   |     | dry_deposition_of_NO2
+  DD_NO3            | kg m-2 s-1     | xy  |   |    |   |   |     | dry_deposition_of_NO3
+  DD_N2O5           | kg m-2 s-1     | xy  |   |    |   |   |     | dry_deposition_of_N2O5
+  DD_OX             | kg m-2 s-1     | xy  |   |    |   |   |     | dry_deposition_of_OX
+  DD_BR             | kg m-2 s-1     | xy  |   |    |   |   |     | dry_deposition_of_BR
+  DD_BRCL           | kg m-2 s-1     | xy  |   |    |   |   |     | dry_deposition_of_BRCL
+  DD_BRONO2         | kg m-2 s-1     | xy  |   |    |   |   |     | dry_deposition_of_BRONO2
+  DD_HBR            | kg m-2 s-1     | xy  |   |    |   |   |     | dry_deposition_of_HBR
+  DD_HOBR           | kg m-2 s-1     | xy  |   |    |   |   |     | dry_deposition_of_HOBR
+  DD_CLO            | kg m-2 s-1     | xy  |   |    |   |   |     | dry_deposition_of_CLO
+  DD_CLONO2         | kg m-2 s-1     | xy  |   |    |   |   |     | dry_deposition_of_CLONO2
+  DD_HCL            | kg m-2 s-1     | xy  |   |    |   |   |     | dry_deposition_of_HCL
+  DD_HOCL           | kg m-2 s-1     | xy  |   |    |   |   |     | dry_deposition_of_HOCL
+  DD_ACTA           | kg m-2 s-1     | xy  |   |    |   |   |     | dry_deposition_of_ACTA
+  DD_ALD2           | kg m-2 s-1     | xy  |   |    |   |   |     | dry_deposition_of_ALD2
+  DD_EOH            | kg m-2 s-1     | xy  |   |    |   |   |     | dry_deposition_of_EOH
+  DD_GLYC           | kg m-2 s-1     | xy  |   |    |   |   |     | dry_deposition_of_GLYC
+  DD_GLYX           | kg m-2 s-1     | xy  |   |    |   |   |     | dry_deposition_of_GLYX
+  DD_HAC            | kg m-2 s-1     | xy  |   |    |   |   |     | dry_deposition_of_HAC
+  DD_MACR           | kg m-2 s-1     | xy  |   |    |   |   |     | dry_deposition_of_MACR
+  DD_MAP            | kg m-2 s-1     | xy  |   |    |   |   |     | dry_deposition_of_MAP
+  DD_MGLY           | kg m-2 s-1     | xy  |   |    |   |   |     | dry_deposition_of_MGLY
+  DD_MVK            | kg m-2 s-1     | xy  |   |    |   |   |     | dry_deposition_of_MVK
+  DD_PAN            | kg m-2 s-1     | xy  |   |    |   |   |     | dry_deposition_of_PAN
+  DD_PMN            | kg m-2 s-1     | xy  |   |    |   |   |     | dry_deposition_of_PMN
+  DD_PPN            | kg m-2 s-1     | xy  |   |    |   |   |     | dry_deposition_of_PPN
+  DD_R4N2           | kg m-2 s-1     | xy  |   |    |   |   |     | dry_deposition_of_R4N2
+  DD_RIP            | kg m-2 s-1     | xy  |   |    |   |   |     | dry_deposition_of_RIP
+  WD_CH2O           | kg m-2 s-1     | xy  |   |    |   |   |     | wet_deposition_of_CH2O
+  WD_HCOOH          | kg m-2 s-1     | xy  |   |    |   |   |     | wet_deposition_of_HCOOH
+  WD_HNO2           | kg m-2 s-1     | xy  |   |    |   |   |     | wet_deposition_of_HNO2
+  WD_HNO3           | kg m-2 s-1     | xy  |   |    |   |   |     | wet_deposition_of_HNO3
+  WD_HNO4           | kg m-2 s-1     | xy  |   |    |   |   |     | wet_deposition_of_HNO4
+  WD_HO2            | kg m-2 s-1     | xy  |   |    |   |   |     | wet_deposition_of_HO2
+  WD_H2O2           | kg m-2 s-1     | xy  |   |    |   |   |     | wet_deposition_of_H2O2
+  WD_MP             | kg m-2 s-1     | xy  |   |    |   |   |     | wet_deposition_of_MP
+  WD_NO3            | kg m-2 s-1     | xy  |   |    |   |   |     | wet_deposition_of_NO3
+  WD_OX             | kg m-2 s-1     | xy  |   |    |   |   |     | wet_deposition_of_OX
+  WD_BR             | kg m-2 s-1     | xy  |   |    |   |   |     | wet_deposition_of_BR
+  WD_BRCL           | kg m-2 s-1     | xy  |   |    |   |   |     | wet_deposition_of_BRCL
+  WD_HBR            | kg m-2 s-1     | xy  |   |    |   |   |     | wet_deposition_of_HBR
+  WD_HOBR           | kg m-2 s-1     | xy  |   |    |   |   |     | wet_deposition_of_HOBR
+  WD_CLO            | kg m-2 s-1     | xy  |   |    |   |   |     | wet_deposition_of_CLO
+  WD_CLONO2         | kg m-2 s-1     | xy  |   |    |   |   |     | wet_deposition_of_CLONO2
+  WD_HCL            | kg m-2 s-1     | xy  |   |    |   |   |     | wet_deposition_of_HCL
+  WD_HOCL           | kg m-2 s-1     | xy  |   |    |   |   |     | wet_deposition_of_HOCL
+  WD_ACTA           | kg m-2 s-1     | xy  |   |    |   |   |     | wet_deposition_of_ACTA
+  WD_EOH            | kg m-2 s-1     | xy  |   |    |   |   |     | wet_deposition_of_EOH
+  WD_GLYC           | kg m-2 s-1     | xy  |   |    |   |   |     | wet_deposition_of_GLYC
+  WD_GLYX           | kg m-2 s-1     | xy  |   |    |   |   |     | wet_deposition_of_GLYX
+  WD_MAP            | kg m-2 s-1     | xy  |   |    |   |   |     | wet_deposition_of_MAP
+  WD_MGLY           | kg m-2 s-1     | xy  |   |    |   |   |     | wet_deposition_of_MGLY
+  WD_RIP            | kg m-2 s-1     | xy  |   |    |   |   |     | wet_deposition_of_RIP
+</ExportSpec>

@@ -1,0 +1,51 @@
+! Blank file in which we can put "overrides" for parameters
+
+LAYOUT = 30, 36
+#override DT = 450.0
+#override DT_THERM = 450.
+!BAD_VAL_SST_MIN = -3.0
+!BAD_VAL_SSS_MAX = 55.0
+HFREEZE = 2.0
+
+! disable checksums
+RESTART_CHECKSUMS_REQUIRED = False
+
+!VERBOSITY = 9
+!DEBUG = True
+!REPORT_UNUSED_PARAMS = True
+
+#override GUST_CONST = 1.e-31
+
+#override NUM_DIAG_COORDS = 1
+#override DIAG_COORDS = "z Z ZSTAR"
+#override DIAG_COORD_DEF_Z = "WOA09"
+
+#override TIDEAMP_FILE = "tidal_amplitude.v20140616.nc_newtopo_config.nc"
+#override GEOTHERMAL_FILE = "geothermal_davies2013_v1_newtopo_config.nc"
+#override CHL_FILE = "seawifs-clim-1997-2010.1440x1080.v20180328_newtopo_config.nc"
+
+
+!# needed for L4 restore files
+!# -- trying additional options to tamp down initialization shock
+! DEPRESS_INITIAL_SURFACE = True
+! SURFACE_HEIGHT_IC_FILE =
+! SURFACE_HEIGHT_IC_VAR =
+
+!# Relax SSS:
+RESTORE_SALINITY = True
+!FLUXCONST_SALT = 0.1667
+FLUXCONST_SALT = 1.0
+SALT_RESTORE_FILE = "rev_filled_remapped_cda_ESACCI_SSS_v2_20190101_20200929.nc"
+SALT_RESTORE_VARIABLE = "SALT"
+SRESTORE_AS_SFLUX = True
+MAX_DELTA_SRESTORE = 10.0
+!MASK_SRESTORE_UNDER_ICE = True
+!#
+!# Relax SST:
+!#
+RESTORE_TEMPERATURE = True
+FLUXCONST_TEMP = 1.0
+SST_RESTORE_FILE = "rev_filled_remapped_cda_OSTIAv2_SST_v2_20190101_20200929.nc"
+SST_RESTORE_VARIABLE = "SST"
+MAX_DELTA_TRESTORE = 10.0
+SPEAR_ECDA_SST_RESTORE_TFREEZE = True
