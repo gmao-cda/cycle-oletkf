@@ -1,0 +1,3 @@
+[submodule "exp_template"]
+	path = exp_template
+	url = git@github.com:gmao-cda/exp_template.git
